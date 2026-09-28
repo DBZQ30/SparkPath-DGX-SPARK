@@ -244,6 +244,43 @@ SparkPath 用「**大模型 + RAG 知识库 + 可执行的业务 Skill**」把�
 
 Skill 的开发、评测与发布流程见 [`agent4som/shared_skills/README.md`](agent4som/shared_skills/README.md)。
 
+### 5.1 评测结论（三 tier 全 PASS）
+
+三个 Skill 均通过 **NVIDIA SkillEvaluator** 三 tier 评测（**双 agent**：`claude-code` + `codex`）：
+
+| Skill | Tier 1 | Tier 2 | Tier 3 | scored | lift（`claude-code` / `codex`） |
+|-------|:------:|:------:|:------:|:------:|-------------------------------|
+| `training-plan-interpretation` | 11/11 | PASS | **pass** | 47/47 | **+24.0 / +22.2 点** |
+| `multi-path-academic-planning` | 11/11 | PASS | **pass** | 48/48 | **+34.1 / +9.3 点** |
+| `academic-warning` | 11/11 | PASS | **pass** | 72/72 | **+22.3 / +10.1 点** |
+
+- 评测源 revision：`85746b6`；三者 `BENCHMARK.md` 均为官方生成版
+  **"✅ Overall verdict: PASS — Recommended for publication"**（见各 Skill 目录）。
+- 判定依据：*dimension PASS ≥ 50%* 且 *overall lift ≥ +5 点*。
+
+### 5.2 可发布包（`dist/`）
+
+`dist/` 存放**已签名**的可发布包 —— 由 `agent4som/scripts/export_skill_release.sh`
+从 Skill 源码树生成（自动排除本机评测夹具 / 缓存 / PII），无需本地重跑即可直接使用：
+
+| 发布包 | 大小 | 版本 | 官方 5 件 |
+|--------|------|------|-----------|
+| [`academic-warning-4.7.0.zip`](dist/academic-warning-4.7.0.zip) | 27 KB | 4.7.0 | `SKILL.md` · `skill-card.md` · `BENCHMARK.md` · `evals/evals.json` · `skill.oms.sig` |
+| [`training-plan-interpretation-1.5.0.zip`](dist/training-plan-interpretation-1.5.0.zip) | 18 KB | 1.5.0 | 同上 |
+| [`multi-path-academic-planning-1.4.0.zip`](dist/multi-path-academic-planning-1.4.0.zip) | 21 KB | 1.4.0 | 同上 |
+
+> **签名说明**：`skill.oms.sig` 为**本项目自建根证书**（`SparkPath Internal Root CA`）签发的
+> detached OMS 签名，可验证"发布包内容自签名后未被修改"。
+> 它**不是 NVIDIA 官方签发**，因此无法通过 `nv-agent-root-cert.pem` 验证 —— 发布到
+> NVIDIA catalog 需由 NVIDIA 重新签名（见 [`agent4som/shared_skills/README.md`](agent4som/shared_skills/README.md) §11）。
+> 源码树**不放** `skill.oms.sig`（官方流程：跑评测 → 评审 → **再签名**）。
+
+**重新生成发布包**（改动 Skill 后需重签）：
+
+```bash
+bash agent4som/scripts/export_skill_release.sh <skill-name>   # 产出到 ~/work/skill-release/<skill>/
+```
+
 ---
 
 ## 6. 仓库结构
@@ -276,6 +313,7 @@ SparkPath-DGX-SPARK/
 ├── deploy/                          # 【部署】DGX 灰度路由、隧道、GPU 服务
 │   ├── dgx/                         #   nginx 路由、SSH 反向隧道、miniapp-proxy
 │   └── gpu-services/                #   vLLM / Embedding / Reranker systemd 单元
+├── dist/                            # 【交付】三个 Skill 的已签名可发布包（见 §5.2）
 └── docs/                            # DGX Spark 迁移部署记录
 ```
 
@@ -286,6 +324,7 @@ SparkPath-DGX-SPARK/
 | `agent4som/` | [README](agent4som/README.md) | 后端核心：RAG 知识库、业务模块、三个 Skill |
 | `agent4som-hermesagent/` | [README](agent4som-hermesagent/README.md) | Hermes 运行时家目录、配置与平台插件 |
 | `miniprogram-framework-frontend/` | [README](miniprogram-framework-frontend/README.md) | 微信小程序前端 |
+| `dist/` | [§5.2 可发布包](#52-可发布包dist) | 三个 Skill 的已签名发布包（含 OMS 签名） |
 
 ---
 
