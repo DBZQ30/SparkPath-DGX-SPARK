@@ -1,0 +1,181 @@
+/* pages/plan/plan.wxss —— 培养方案解读（「学籍台账」视觉系统）
+   数字与学分数值用宋体（.ui-num），占比条用墨蓝单色梯度。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 学分结构 ── */
+.total { padding: 4rpx 0 20rpx; }
+.total-num {
+  font-size: 96rpx;
+  line-height: 1;
+}
+.total-unit {
+  margin-left: 8rpx;
+  font-size: 30rpx;
+  color: var(--ink-3);
+}
+.total-cap {
+  display: block;
+  margin-top: 10rpx;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+
+.bar {
+  display: flex;
+  height: 20rpx;
+  margin-bottom: 24rpx;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.bar-seg { height: 100%; }
+.seg-0 { background: #17324D; }
+.seg-1 { background: #3E5C7A; }
+.seg-2 { background: #6E8AA6; }
+.seg-3 { background: #9FB4C8; }
+.seg-4 { background: #C6D3E0; }
+
+.legend { margin-bottom: 8rpx; }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 8rpx 0;
+}
+.legend-dot {
+  width: 16rpx;
+  height: 16rpx;
+  flex-shrink: 0;
+  border-radius: 4rpx;
+}
+.legend-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+}
+.legend-val { font-size: var(--fs-meta); }
+
+.sub-list {
+  margin-top: 16rpx;
+  border-top: 1rpx solid var(--line);
+}
+.sub-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.sub-row:last-child { border-bottom: none; }
+.sub-name { font-size: var(--fs-body); color: var(--ink-2); }
+.sub-count { font-size: var(--fs-micro); color: var(--ink-3); }
+.sub-val { font-size: var(--fs-body); white-space: nowrap; }
+
+/* ── 学期地图 ── */
+.sem-tabs { white-space: nowrap; margin-bottom: 8rpx; }
+.sem-tab {
+  display: inline-block;
+  padding: 14rpx 26rpx;
+  margin-right: 12rpx;
+  border-radius: 12rpx;
+  background: var(--canvas);
+  text-align: center;
+}
+.sem-tab-on { background: var(--ink); }
+.sem-name {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.sem-credit {
+  display: block;
+  margin-top: 4rpx;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+}
+.sem-tab-on .sem-name,
+.sem-tab-on .sem-credit { color: #fff; }
+
+.course-list { max-height: 640rpx; overflow-y: auto; }
+.course-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.course-row:last-child { border-bottom: none; }
+.course-name {
+  flex: 1;
+  font-size: var(--fs-body);
+  color: var(--ink);
+}
+.course-val { font-size: var(--fs-meta); color: var(--ink-3); white-space: nowrap; }
+
+/* ── 先修关系 ── */
+.chain-list { margin-bottom: 16rpx; }
+.chain-row {
+  padding: 20rpx 24rpx;
+  margin-bottom: 12rpx;
+  background: var(--canvas);
+  border-left: 6rpx solid var(--ink);
+  border-radius: 8rpx;
+}
+.chain-text {
+  font-size: var(--fs-body);
+  color: var(--ink);
+  line-height: 1.6;
+}
+.link-btn {
+  margin-top: 8rpx;
+  padding: 22rpx 0;
+  text-align: center;
+  font-size: var(--fs-body);
+  color: var(--ink);
+  border-top: 1rpx solid var(--line);
+}
+.link-btn:active { opacity: .6; }
+.prereq-img {
+  width: 100%;
+  margin-top: 16rpx;
+  border-radius: var(--r-sm);
+  border: 1rpx solid var(--line);
+}
+
+/* ── 毕业条件 ── */
+.req-list { margin-bottom: 8rpx; }
+.req-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.req-row:last-child { border-bottom: none; }
+.req-body { flex: 1; min-width: 0; }
+.req-type {
+  margin-right: 8rpx;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+}
+.req-text {
+  font-size: var(--fs-body);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.hint { display: block; margin-top: 16rpx; }

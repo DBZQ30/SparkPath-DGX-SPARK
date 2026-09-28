@@ -1,0 +1,295 @@
+[
+    {
+        "name": "大数据管理与应用专业",
+        "total": "142+8学分",
+        "children": [
+            {
+                "name": "课程教学",
+                "credit": "124学分",
+                "children": [
+                    {
+                        "name": "通识教育类",
+                        "credit": "37学分",
+                        "children": [
+                            {
+                                "name": "公共课程",
+                                "credit": "25学分",
+                                "children": [
+                                    {"name": "思想政治理论", "credit": "15学分"},
+                                    {"name": "军事理论", "credit": "2学分"},
+                                    {"name": "大学英语", "credit": "6学分"},
+                                    {"name": "体育", "credit": "2学分"},
+                                    {"name": "劳育", "credit": "0学分"}
+                                ]
+                            },
+                            {
+                                "name": "模块课程",
+                                "credit": "12学分",
+                                "children": [
+                                    {"name": "核心课程", "credit": "6学分"},
+                                    {"name": "选修课程", "credit": "6学分"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "大类平台课程",
+                        "credit": "53学分",
+                        "children": [
+                            {"name": "学科门类基础课程", "credit": "26学分"},
+                            {"name": "专业大类基础课程", "credit": "27学分"}
+                        ]
+                    },
+                    {
+                        "name": "专业课程",
+                        "credit": "34学分",
+                        "children": [
+                            {"name": "专业核心课程", "credit": "24学分"},
+                            {"name": "专业选修课程", "credit": "10学分"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "集中实践",
+                "credit": "18学分",
+                "children": [
+                    {"name": "基本技能训练", "credit": "0学分", "children": [{"name": "小学期集训", "credit": "0学分"}]},
+                    {"name": "专业实习II", "credit": "3学分"},
+                    {"name": "科研训练", "credit": "2学分"},
+                    {"name": "管理系列前沿讲座", "credit": "1学分"},
+                    {"name": "军训", "credit": "2学分"},
+                    {"name": "毕业设计（论文）", "credit": "10学分"}
+                ]
+            },
+            {
+                "name": "课外实践",
+                "credit": "8学分",
+                "children": [
+                    {"name": "思政教育综合实践", "credit": "2学分"},
+                    {"name": "其他课外综合实践", "credit": "6学分"}
+                ]
+            }
+        ]
+    },
+    {
+        "name": "工商管理专业",
+        "total": "148+8学分",
+        "children": [
+            {
+                "name": "课程教学",
+                "credit": "126学分",
+                "children": [
+                    {
+                        "name": "通识教育类",
+                        "credit": "37学分",
+                        "children": [
+                            {
+                                "name": "公共课程",
+                                "credit": "25学分",
+                                "children": [
+                                    {"name": "思想政治理论", "credit": "15学分"},
+                                    {"name": "军事理论", "credit": "2学分"},
+                                    {"name": "大学英语", "credit": "6学分"},
+                                    {"name": "体育", "credit": "2学分"},
+                                    {"name": "劳育", "credit": "0学分"}
+                                ]
+                            },
+                            {
+                                "name": "模块课程",
+                                "credit": "12学分",
+                                "children": [
+                                    {"name": "核心课程", "credit": "6学分"},
+                                    {"name": "选修课程", "credit": "6学分"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "大类平台课程",
+                        "credit": "57学分",
+                        "children": [
+                            {"name": "学科门类基础课程", "credit": "28学分"},
+                            {"name": "专业大类基础课程", "credit": "29学分"}
+                        ]
+                    },
+                    {
+                        "name": "专业课程",
+                        "credit": "32学分",
+                        "children": [
+                            {"name": "专业核心课程", "credit": "24学分"},
+                            {"name": "专业选修课程", "credit": "8学分"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "集中实践",
+                "credit": "22学分",
+                "children": [
+                    {"name": "基本技能训练", "credit": "0学分", "children": [{"name": "小学期集训", "credit": "0学分"}]},
+                    {"name": "专业实习", "credit": "3学分"},
+                    {"name": "课程（项目）设计", "credit": "0学分"},
+                    {"name": "科研训练", "credit": "1学分"},
+                    {"name": "专业综合性实践", "credit": "6学分"},
+                    {"name": "军训", "credit": "2学分"},
+                    {"name": "毕业设计（论文）", "credit": "10学分"}
+                ]
+            },
+            {
+                "name": "课外实践",
+                "credit": "8学分",
+                "children": [
+                    {"name": "思政教育综合实践", "credit": "2学分"},
+                    {"name": "其他课外综合实践", "credit": "6学分"}
+                ]
+            }
+        ]
+    },
+    {
+        "name": "工业工程专业",
+        "total": "153.5+8学分",
+        "children": [
+            {
+                "name": "课程教学",
+                "credit": "130学分",
+                "children": [
+                    {
+                        "name": "通识教育类",
+                        "credit": "37学分",
+                        "children": [
+                            {
+                                "name": "公共课程",
+                                "credit": "25学分",
+                                "children": [
+                                    {"name": "思想政治理论", "credit": "15学分"},
+                                    {"name": "军事理论", "credit": "2学分"},
+                                    {"name": "大学英语", "credit": "6学分"},
+                                    {"name": "体育", "credit": "2学分"},
+                                    {"name": "劳育", "credit": "0学分"}
+                                ]
+                            },
+                            {
+                                "name": "模块课程",
+                                "credit": "12学分",
+                                "children": [
+                                    {"name": "核心课程", "credit": "6学分"},
+                                    {"name": "选修课程", "credit": "6学分"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "大类平台课程",
+                        "credit": "57学分",
+                        "children": [
+                            {"name": "学科门类基础课程", "credit": "30学分"},
+                            {"name": "专业大类基础课程", "credit": "27学分"}
+                        ]
+                    },
+                    {
+                        "name": "专业课程",
+                        "credit": "36学分",
+                        "children": [
+                            {"name": "专业核心课程", "credit": "24学分"},
+                            {"name": "专业选修课程", "credit": "12学分"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "集中实践",
+                "credit": "23.5学分",
+                "children": [
+                    {"name": "基本技能训练", "credit": "0学分", "children": [{"name": "小学期集训", "credit": "0学分"}]},
+                    {"name": "专业实习", "credit": "3学分"},
+                    {"name": "课程（项目）设计", "credit": "1学分"},
+                    {"name": "科研训练", "credit": "6.5学分"},
+                    {"name": "专业综合性实验（践）", "credit": "1学分"},
+                    {"name": "军训", "credit": "2学分"},
+                    {"name": "毕业设计（论文）", "credit": "10学分"}
+                ]
+            },
+            {
+                "name": "课外实践",
+                "credit": "8学分",
+                "children": [
+                    {"name": "思政教育综合实践", "credit": "2学分"},
+                    {"name": "其他课外综合实践", "credit": "6学分"}
+                ]
+            }
+        ]
+    },
+    {
+        "name": "会计学（ACCA）专业",
+        "total": "154+8学分",
+        "children": [
+            {
+                "name": "课程教学",
+                "credit": "136学分",
+                "children": [
+                    {
+                        "name": "通识教育类",
+                        "credit": "37学分",
+                        "children": [
+                            {
+                                "name": "公共课程",
+                                "credit": "25学分",
+                                "children": [
+                                    {"name": "思想政治理论", "credit": "15学分"},
+                                    {"name": "军事理论", "credit": "2学分"},
+                                    {"name": "大学英语", "credit": "6学分"},
+                                    {"name": "体育", "credit": "2学分"},
+                                    {"name": "劳育", "credit": "0学分"}
+                                ]
+                            },
+                            {
+                                "name": "模块课程",
+                                "credit": "12学分",
+                                "children": [
+                                    {"name": "核心课程", "credit": "6学分"},
+                                    {"name": "选修课程", "credit": "6学分"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "大类平台课程",
+                        "credit": "38学分",
+                        "children": [
+                            {"name": "学科门类基础课程", "credit": "24学分"},
+                            {"name": "专业大类基础课程", "credit": "14学分"}
+                        ]
+                    },
+                    {
+                        "name": "专业课程",
+                        "credit": "61学分",
+                        "children": [
+                            {"name": "专业核心课程", "credit": "46学分"},
+                            {"name": "专业选修课程", "credit": "15学分"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "集中实践",
+                "credit": "18学分",
+                "children": [
+                    {"name": "基本技能训练", "credit": "0学分", "children": [{"name": "小学期集训", "credit": "0学分"}]},
+                    {"name": "专业实习", "credit": "3学分"},
+                    {"name": "科研训练", "credit": "3学分"},
+                    {"name": "军训", "credit": "2学分"},
+                    {"name": "毕业设计（论文）", "credit": "10学分"}
+                ]
+            },
+            {
+                "name": "课外实践",
+                "credit": "8学分",
+                "children": [
+                    {"name": "思政教育综合实践", "credit": "2学分"},
+                    {"name": "其他课外综合实践", "credit": "6学分"}
+                ]
+            }
+        ]
+    }
+]

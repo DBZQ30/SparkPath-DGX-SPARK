@@ -1,0 +1,24 @@
+[Unit]
+Description=Training Plan Interpretation HTTP API (miniapp entry) - :8009
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/dgx/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# dgx 上 sudo 需要密码，无法安装 system 级单元 → 用 systemd 用户单元常驻
+# （linger=yes，注销后仍运行）。生产机若有 sudo，改用 deploy/dgx/training-plan-api.service。
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/<DGX_USER>
+Environment=NO_PROXY=127.0.0.1,localhost
+EnvironmentFile=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/.env
+# 单 worker：内嵌单消费者解析队列（多 worker 会产生多个消费者竞争同一队列）
+ExecStart=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/venv/bin/uvicorn \
+    trainingplan.api:app --host 127.0.0.1 --port 8009 --workers 1
+Restart=always
+RestartSec=10
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target

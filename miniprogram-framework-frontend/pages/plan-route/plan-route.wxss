@@ -1,0 +1,112 @@
+/* pages/plan-route/plan-route.wxss —— 多路径个性化学业规划（010）
+   「学籍台账」视觉系统：颜色走令牌、单一强调色、无阴影。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* 模式分段：数量不定，允许换行 */
+.mode-seg { flex-wrap: wrap; }
+.mode-seg .ui-seg-item { flex: 1 0 40%; }
+
+/* ── 规则 / 计划行 ── */
+.rule-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.rule-row:last-child { border-bottom: none; }
+.rule-item {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+}
+.rule-value {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+/* ── 四年时间轴 ── */
+.sem-block { margin-bottom: 28rpx; }
+.sem-block:last-child { margin-bottom: 0; }
+.sem-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.sem-name { font-size: var(--fs-body); }
+.sem-credit { flex-shrink: 0; font-size: var(--fs-meta); color: var(--ink-3); }
+
+.load-bar {
+  height: 12rpx;
+  margin: 12rpx 0 16rpx;
+  background: var(--line);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.load-fill { height: 100%; border-radius: var(--r-pill); }
+.load-light { background: #C6D3E0; }
+.load-medium { background: #6E8AA6; }
+.load-tight { background: var(--amber); }
+.load-over { background: var(--seal); }
+
+.course-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.course-row:last-child { border-bottom: none; }
+.course-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.course-credit { flex-shrink: 0; font-size: var(--fs-meta); color: var(--ink-3); }
+
+/* ── 节奏节点 ── */
+.action-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  padding: 14rpx 0;
+}
+.action-tag {
+  flex-shrink: 0;
+  padding: 4rpx 16rpx;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-micro);
+  line-height: 1.7;
+}
+.tag-official { background: var(--ink); color: #fff; }
+.tag-advice { background: var(--canvas); color: var(--ink-2); }
+.action-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+  line-height: 1.6;
+}

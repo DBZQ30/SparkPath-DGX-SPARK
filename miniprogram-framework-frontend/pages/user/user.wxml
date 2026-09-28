@@ -1,0 +1,62 @@
+<view class="page">
+  <view class="id-card">
+    <view class="avatar">{{avatarChar}}</view>
+    <view class="name-row">
+      <text class="name">{{username}}</text>
+      <view class="edit-btn" bindtap="tapEditName">
+        <view class="ic ic-sm ic-pencil"></view>
+      </view>
+    </view>
+    <view class="ui-role">{{roleLabel}}</view>
+  </view>
+
+  <view class="content">
+    <view class="ui-card">
+      <view class="ui-row" bindtap="tapProfile">
+        <view class="ui-ico"><view class="ic ic-file"></view></view>
+        <view class="ui-txt">
+          <view class="ui-lbl">我的档案</view>
+          <view class="ui-desc">查看学籍信息与匹配状态</view>
+        </view>
+        <view class="ic ic-sm ic-chev ui-chev"></view>
+      </view>
+      <view class="ui-row" bindtap="tapAbout">
+        <view class="ui-ico"><view class="ic ic-info"></view></view>
+        <view class="ui-txt">
+          <view class="ui-lbl">关于本助手</view>
+          <view class="ui-desc">数据来源与适用范围</view>
+        </view>
+        <view class="ic ic-sm ic-chev ui-chev"></view>
+      </view>
+    </view>
+
+    <view wx:if="{{loginStatus === '未登录'}}" class="login-area">
+      <button class="login-btn" bindtap="tapLogin" loading="{{logging}}" disabled="{{logging}}">微信登录</button>
+    </view>
+
+    <view class="foot">本科新生学业规划智能助手 · 西安交通大学管理学院</view>
+  </view>
+
+  <!-- 修改用户名 -->
+  <view wx:if="{{showEdit}}" class="modal-overlay" catchtap="cancelEdit">
+    <view class="modal-card" catchtap="preventBubble">
+      <view class="modal-title">修改用户名</view>
+      <input class="modal-input" placeholder="输入用户名" value="{{editValue}}" bindinput="onEditInput" maxlength="50" />
+      <view class="modal-btns">
+        <view class="ui-btn ui-btn-ghost" catchtap="cancelEdit">取消</view>
+        <view class="ui-btn ui-btn-primary" catchtap="submitEdit">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于本助手 -->
+  <view wx:if="{{showAbout}}" class="ui-sheet-mask" bindtap="closeAbout" catchtouchmove="noop">
+    <view class="ui-sheet" catchtap="preventBubble">
+      <view class="ui-sheet-title">关于本助手</view>
+      <view class="ui-sheet-text">{{aboutText}}</view>
+      <view class="ui-sheet-actions">
+        <view class="ui-btn ui-btn-primary" bindtap="closeAbout">知道了</view>
+      </view>
+    </view>
+  </view>
+</view>

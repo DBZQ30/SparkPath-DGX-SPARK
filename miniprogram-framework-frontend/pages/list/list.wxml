@@ -1,0 +1,58 @@
+<view class="page">
+  <!-- Tab bar for identity management (老师审核 / 管理员审核 / 已认证) -->
+  <view wx:if="{{isIdentity}}" class="ui-seg">
+    <view class="ui-seg-item {{_type === 'auth-teacher' ? 'ui-seg-on' : ''}}" bindtap="switchTab" data-type="auth-teacher">老师审核</view>
+    <view class="ui-seg-item {{_type === 'auth-admin' ? 'ui-seg-on' : ''}}" bindtap="switchTab" data-type="auth-admin">管理员审核</view>
+    <view class="ui-seg-item {{_type === 'certified-users' ? 'ui-seg-on' : ''}}" bindtap="switchTab" data-type="certified-users">已认证</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+  <view wx:if="{{!loading && empty}}" class="ui-empty">暂无数据</view>
+
+  <view wx:if="{{!loading && !empty}}" class="ui-list">
+    <view wx:for="{{items}}" wx:key="id" class="ui-item list-item" data-index="{{index}}">
+      <view class="ui-item-main">
+        <view class="ui-item-row">
+          <text class="ui-item-title">{{item.label}}</text>
+        </view>
+        <text class="item-value">{{item.value}}</text>
+        <text wx:if="{{item.extra}}" class="ui-item-sub">{{item.extra}}</text>
+      </view>
+
+      <!-- Approve/reject for auth -->
+      <view wx:if="{{isAuth && item.status && item.status.indexOf('pending') !== -1}}" class="auth-actions">
+        <button class="ui-pill ui-pill-primary" size="mini" data-index="{{index}}" data-id="{{item.id}}" catchtap="tapApprove">同意</button>
+        <button class="ui-pill ui-pill-danger" size="mini" data-index="{{index}}" data-id="{{item.id}}" catchtap="tapReject">拒绝</button>
+      </view>
+      <!-- Change role for certified-users -->
+      <view wx:if="{{isCertifiedUsers}}" class="auth-actions">
+        <button class="ui-pill ui-pill-primary" size="mini" data-index="{{index}}" data-id="{{item.id}}" catchtap="tapChangeRole">变更身份</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 变更身份弹层 -->
+  <view wx:if="{{showChangeRole}}" class="ui-sheet-mask" catchtap="cancelChangeRole">
+    <view class="ui-sheet" catchtap="preventBubble">
+      <view class="ui-sheet-head">
+        <text class="ui-sheet-title title-flat">变更用户身份</text>
+        <view class="ui-sheet-close" catchtap="cancelChangeRole">
+          <view class="ic ic-sm ic-close"></view>
+        </view>
+      </view>
+      <view class="ui-field">
+        <text class="ui-field-label">目标身份</text>
+        <radio-group bindchange="onTargetRoleChange">
+          <label class="radio-label"><radio value="student"/>学生</label>
+          <label class="radio-label"><radio value="guest"/>访客</label>
+          <label class="radio-label"><radio value="teacher"/>{{uiText.ROLE_TEACHER}}</label>
+          <label class="radio-label"><radio value="admin"/>管理员</label>
+        </radio-group>
+      </view>
+      <view class="ui-sheet-actions">
+        <button class="ui-btn ui-btn-ghost" catchtap="cancelChangeRole">取消</button>
+        <button class="ui-btn ui-btn-primary" catchtap="submitChangeRole">确认变更</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,44 @@
+/* pages/jxtz-sync/jxtz-sync.wxss —— 教务通知同步（「学籍台账」视觉系统） */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 状态卡 ── */
+.row-pill {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.row-val {
+  flex-shrink: 0;
+  margin-top: 0;
+  text-align: right;
+}
+.run-wrap { border-top: 1rpx solid var(--line); }
+.run-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+.run-btn::after { border: none; }
+.run-btn[disabled] {
+  background: var(--line);
+  color: var(--ink-3);
+}
+.run-status { display: block; margin-top: 16rpx; }
+
+/* ── 运行结果色调（JS 下发的 tone）── */
+.tag-ok { background: var(--jade-soft); color: var(--jade); }
+.tag-partial { background: var(--amber-soft); color: var(--amber); }
+.tag-fail { background: var(--seal-soft); color: var(--seal); }

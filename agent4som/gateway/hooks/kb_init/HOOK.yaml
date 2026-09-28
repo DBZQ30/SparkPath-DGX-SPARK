@@ -1,0 +1,4 @@
+name: kb-init
+description: "Initialize ChromaDB knowledge base singleton on gateway startup"
+events:
+  - gateway:startup

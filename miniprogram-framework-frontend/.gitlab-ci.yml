@@ -1,0 +1,50 @@
+# GitLab CI —— 小程序架构流水线（当前仅本科新生学业规划智能助手 jwc）
+# 触发：MR / master 推送 → 自动跑架构核验（npm test）
+# 发布：master 上的手动 job（release:jwc），密钥从 CI 变量恢复，绝不入库
+stages:
+  - test
+  - release
+
+variables:
+  NODE_IMAGE: "node:18"
+
+# 共用：安装依赖（package-lock.json 已入库，用 npm ci 保证可复现）
+.test_base: &test_base
+  image: $NODE_IMAGE
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci
+
+architecture-check:
+  <<: *test_base
+  stage: test
+  script:
+    - npm run switch          # 生成构建产物（不入库，CI 内现生成）
+    - npm test                # validate.js：实例构建冒烟 + 硬编码守卫 + 模块加载链
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# 发布 job 模板：手动触发，版本/说明通过 Run pipeline 变量传入（VERSION / DESC）
+.release_base: &release_base
+  image: $NODE_IMAGE
+  stage: release
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci
+    - node scripts/ci-restore-keys.js    # 从 CI 变量 KEY_<AppID> 恢复上传密钥
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
+
+release:jwc:
+  <<: *release_base
+  script:
+    - npm run release -- jwc --version "${VERSION:-1.0.0}" --desc "${DESC:-CI 发布}"

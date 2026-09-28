@@ -1,0 +1,36 @@
+# Hermes Gateway 多 Worker 部署方案
+#
+# Hermes Gateway 是单进程，通过 systemd 模板 + nginx 实现水平扩展。
+# 每个实例监听独立端口，nginx 做反向代理和负载均衡。
+
+# ── 1. Systemd 模板 ──────────────────────────────────────────────
+# 保存为 /etc/systemd/system/hermes-gateway@.service
+
+[Unit]
+Description=Hermes Gateway Worker %i
+After=network.target chroma-server.service
+Requires=chroma-server.service
+
+[Service]
+Type=simple
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som
+EnvironmentFile=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som-hermesagent/.env
+Environment=HERMES_HOME=/home/<DGX_USER>/.hermes
+Environment="PATH=/home/<DGX_USER>/.hermes/hermes-agent/venv/bin:/usr/bin:/bin"
+ExecStart=/home/<DGX_USER>/.hermes/hermes-agent/venv/bin/hermes gateway run --replace
+Restart=always
+RestartSec=5
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ReadWritePaths=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/data
+ReadWritePaths=/home/<DGX_USER>/.hermes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictRealtime=yes
+PrivateDevices=yes
+
+[Install]
+WantedBy=multi-user.target

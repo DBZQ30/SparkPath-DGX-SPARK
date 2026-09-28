@@ -1,0 +1,226 @@
+{
+  "skill_name": "academic-warning",
+  "evals": [
+    {
+      "id": "academic-warning-pos-precheck-ready-then-check",
+      "prompt": "帮我检查23级学生的选课预警情况",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli precheck --grade 2023级",
+      "expected_output": "管理员请求 → 加载 academic-warning，规范年级为 2023级，先跑 precheck；末行 [precheck] READY 后执行 check，回报摘要并指引在小程序查看。",
+      "assertions": [
+        "识别为管理员选课检查请求并加载 academic-warning",
+        "确定年级为规范格式 2023级",
+        "先执行 python -m academicwarning.cli precheck --grade 2023级",
+        "读到末行 [precheck] READY → 再执行 python -m academicwarning.cli check --grade 2023级",
+        "原样回报 check 摘要，并提示名单/Excel 报告可在小程序“学业预警”页查看/下载"
+      ]
+    },
+    {
+      "id": "academic-warning-pos-normalize-short-grade",
+      "prompt": "检查下23级选课",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli precheck --grade 2023级",
+      "expected_output": "把“23级”规范为“2023级”后执行，不按“23级”字面传参。",
+      "assertions": [
+        "加载 academic-warning",
+        "把 23级 规范为 2023级",
+        "执行 precheck（必要时再 check），参数为 2023级"
+      ]
+    },
+    {
+      "id": "academic-warning-pos-precheck-pending-wait",
+      "prompt": "跑一下2025级选课预警",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli precheck --grade 2025级",
+      "expected_output": "2025级有文件处于解析中 → precheck 末行 [precheck] PENDING → 回报“正在解析，约需几分钟，稍后再说一句即可”，不执行 check、不让重传。",
+      "assertions": [
+        "加载 academic-warning",
+        "执行 python -m academicwarning.cli precheck --grade 2025级",
+        "读到末行 [precheck] PENDING",
+        "回报“<文件>正在解析，约需几分钟；解析完成后再对我说一句『跑选课检查』即可执行”",
+        "不执行 check，不要求管理员重新上传文件"
+      ]
+    },
+    {
+      "id": "academic-warning-pos-precheck-incomplete-list-all",
+      "prompt": "帮我看看2024级的选课检查数据齐不齐",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli precheck --grade 2024级",
+      "expected_output": "2024级数据缺失/解析失败 → precheck 末行 [precheck] INCOMPLETE → 把全部缺失项原样列出，指引在小程序“学业预警”页补齐，不执行 check。",
+      "assertions": [
+        "加载 academic-warning",
+        "执行 precheck 并读到 [precheck] INCOMPLETE",
+        "把**全部**不齐备项逐条回报（多个缺失须全部告知，不漏项）",
+        "指引在小程序“学业预警”页补齐对应文件",
+        "不执行 check"
+      ]
+    },
+    {
+      "id": "academic-warning-pos-major-elective-gap",
+      "prompt": "2023级有没有学生专业选修学分不够的？跑一下检查",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli check --grade 2023级",
+      "expected_output": "选课合理性检查请求，执行检查并回报含分专业分布的摘要。",
+      "assertions": [
+        "加载 academic-warning",
+        "执行选课检查命令",
+        "回报“选课不合理 N 人（分专业分布）”类摘要"
+      ]
+    },
+    {
+      "id": "academic-warning-diff-missing-grade",
+      "prompt": "跑一下选课预警",
+      "expected_skill": "academic-warning",
+      "expected_script": "from academicwarning.db import WarningDB",
+      "expected_output": "未指定年级：先列出现有年级，再问要检查哪个；不臆造年级，不跨年级合并。",
+      "assertions": [
+        "加载 academic-warning",
+        "先执行 list_grades 列出现有年级",
+        "向管理员询问要检查哪个年级，而不是猜测"
+      ]
+    },
+    {
+      "id": "academic-warning-diff-multi-grade",
+      "prompt": "帮我把2023级和2024级的选课都检查一下",
+      "expected_skill": "academic-warning",
+      "expected_script": null,
+      "expected_output": "只支持逐个年级检查，不跨年级合并；应分别对每个年级执行或与管理员确认逐个执行。",
+      "assertions": [
+        "加载 academic-warning",
+        "说明只支持逐个年级检查，不合并",
+        "按年级分别执行（或先与管理员确认）"
+      ]
+    },
+    {
+      "id": "academic-warning-pos-permission-denied-response",
+      "prompt": "（学生身份）帮我跑一下2023级选课预警",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli precheck --grade 2023级",
+      "expected_output": "题面已声明学生身份 → 按该身份执行命令（会话身份由 HERMES_SESSION_PLATFORM / HERMES_SESSION_USER_ID 提供，可用环境变量如实声明），命令返回“无权限：仅管理员可触发选课检查”（退出码 1），原样回复，不重试、不换命令。",
+      "assertions": [
+        "加载 academic-warning",
+        "按题面声明的学生身份执行命令（用 HERMES_SESSION_PLATFORM / HERMES_SESSION_USER_ID 如实声明身份）",
+        "执行命令后收到无权限退出码 1",
+        "原样回复“无权限：仅管理员可触发选课检查”",
+        "不重试、不换其他命令、不手工传 --user/--platform 伪造身份参数"
+      ]
+    },
+    {
+      "id": "academic-warning-pos-degraded-missing-grades",
+      "prompt": "2024级跑一下选课检查",
+      "expected_skill": "academic-warning",
+      "expected_script": "academicwarning.cli check --grade 2024级",
+      "expected_output": "目标年级数据缺失：无论走 precheck（末行 [precheck] INCOMPLETE）还是直接 check（退出码 0 的降级文本），都必须按“数据缺失”处理而非命令崩溃；不臆造检查数字，原样回报缺失项并指引在小程序“学业预警”页补齐。",
+      "assertions": [
+        "加载 academic-warning",
+        "对该年级执行检查流程（precheck 和/或 check）",
+        "识别数据缺失（[precheck] INCOMPLETE 或退出码 0 的降级文本）为数据缺失而非命令崩溃",
+        "不臆造检查数字或检查结论",
+        "原样回报缺失项并指引在小程序“学业预警”页补齐"
+      ]
+    },
+    {
+      "id": "academic-warning-neg-upload-file",
+      "prompt": "帮我上传这份2023级的选课结果文件",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "数据文件上传不在对话完成，应引导到小程序“学业预警”页上传，不加载本 skill 的检查流程。",
+      "assertions": [
+        "不执行选课检查命令",
+        "引导管理员在小程序“学业预警”页上传文件"
+      ]
+    },
+    {
+      "id": "academic-warning-neg-score-rank-query",
+      "prompt": "查一下张三的成绩和排名",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "成绩/排名查询不属于本 skill。",
+      "assertions": [
+        "不加载 academic-warning",
+        "按成绩/排名的其他流程处理或说明不在本 skill 范围"
+      ]
+    },
+    {
+      "id": "academic-warning-neg-non-admin",
+      "prompt": "（非管理员）看看这学期专业选修够不够",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "非管理员请求不加载；若触发命令会返回无权限。",
+      "assertions": [
+        "不加载 academic-warning 的检查流程",
+        "按权限规则回复，不触发管理员操作"
+      ]
+    },
+    {
+      "id": "academic-warning-doc-precheck-pending-dispatch",
+      "prompt": "只阅读 academic-warning 的文档回答问题，不要执行任何命令、脚本或网络请求。如果对 2023 级执行 precheck，末行显示 [precheck] PENDING，我应该怎么回复管理员？",
+      "expected_skill": "academic-warning",
+      "expected_script": null,
+      "expected_output": "PENDING 表示不齐备项里至少有一项正在解析/排队中：应回复「<文件>正在解析，约需几分钟；解析完成后再对我说一句『跑选课检查』即可执行」，不执行 check、也不要求管理员重传。",
+      "assertions": [
+        "加载 academic-warning",
+        "把 PENDING 解释为「解析中/排队中」，与真缺失（INCOMPLETE）区分开",
+        "回复「正在解析，约需几分钟，稍后再试」类措辞",
+        "明确不执行 check",
+        "不要求管理员重新上传文件"
+      ]
+    },
+    {
+      "id": "academic-warning-doc-permission-refusal-wording",
+      "prompt": "只阅读 academic-warning 的文档回答问题，不要执行任何命令、脚本或网络请求。非管理员触发选课检查时，命令的退出码和 stdout 文本分别是什么？我应该如何回复？",
+      "expected_skill": "academic-warning",
+      "expected_script": null,
+      "expected_output": "退出码为 1，stdout 为「无权限：仅管理员可触发选课检查」；应原样回复这一整句，不改写、不补充解释、不换命令、不重试、不伪造身份。",
+      "assertions": [
+        "加载 academic-warning",
+        "给出退出码 1",
+        "精确引用「无权限：仅管理员可触发选课检查」",
+        "要求原样回复、不改写话术",
+        "说明不重试、不换命令、不伪造身份"
+      ]
+    },
+    {
+      "id": "academic-warning-doc-degraded-exit-zero",
+      "prompt": "只阅读 academic-warning 的文档回答问题，不要执行任何命令、脚本或网络请求。如果 check 返回退出码 0，但 stdout 是「选课检查：成绩单未上传（已修按 0 计会误判），请先上传成绩单」，这算成功还是失败？该怎么处理？",
+      "expected_skill": "academic-warning",
+      "expected_script": null,
+      "expected_output": "这是**数据缺失的降级提示**——退出码 0 不代表检查成功，也不是命令崩溃。应原样回报缺失项并指引管理员在小程序「学业预警」页上传/补齐，且不得臆造检查人数、结论或报告文件名。",
+      "assertions": [
+        "加载 academic-warning",
+        "判定为「数据缺失的降级提示」，而不是检查成功",
+        "明确这不是命令崩溃",
+        "指引管理员在小程序「学业预警」页上传/补齐",
+        "明确不得臆造检查数字或结论"
+      ]
+    },
+    {
+      "id": "academic-warning-doc-grade-normalize-and-ask",
+      "prompt": "只阅读 academic-warning 的文档回答问题，不要执行任何命令、脚本或网络请求。管理员只说「检查下23级选课」，命令里的 --grade 应该传什么？如果管理员完全没提年级呢？",
+      "expected_skill": "academic-warning",
+      "expected_script": null,
+      "expected_output": "把「23级」规范化为「2023级」（匹配 20\\d\\d级）后传给 --grade；完全未提年级时，先列出现有年级并询问要检查哪个，不臆造年级、不跨年级合并，因为只支持逐个年级检查。",
+      "assertions": [
+        "加载 academic-warning",
+        "把 23级 规范化为 2023级 再传参",
+        "未指定年级时先列出现有年级、再向管理员询问",
+        "不臆造年级",
+        "说明只支持逐个年级、不跨年级合并"
+      ]
+    },
+    {
+      "id": "academic-warning-doc-precheck-why-and-ready",
+      "prompt": "只阅读 academic-warning 的文档回答问题，不要执行任何命令、脚本或网络请求。为什么必须先跑 precheck 再跑 check？precheck 末行出现 [precheck] READY 之后应该做什么？",
+      "expected_skill": "academic-warning",
+      "expected_script": null,
+      "expected_output": "precheck 只读、无副作用，一次性列出该年级五类数据（选课结果/学籍名单/培养方案/成绩单/通识表）的齐备情况，避免逐条降级文本与管理员反复试；末行 READY 表示齐备 → 继续执行 check --grade <grade>，回报摘要并指引在小程序「学业预警」页查看/下载名单与 Excel 报告。",
+      "assertions": [
+        "加载 academic-warning",
+        "说明 precheck 只读、无副作用",
+        "说明它一次性列全五类数据的齐备情况",
+        "说明 READY 表示数据齐备",
+        "READY 之后继续执行 check，并指引在小程序查看/下载报告"
+      ]
+    }
+  ]
+}

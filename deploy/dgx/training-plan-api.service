@@ -1,0 +1,24 @@
+[Unit]
+Description=Training Plan Interpretation HTTP API (miniapp entry) - :8009
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/dgx/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/<DGX_USER>
+Environment=NO_PROXY=127.0.0.1,localhost
+EnvironmentFile=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/.env
+# 单 worker：内嵌单消费者解析队列（多 worker 会产生多个消费者竞争同一队列）
+ExecStart=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/venv/bin/uvicorn \
+    trainingplan.api:app --host 0.0.0.0 --port 8009 --workers 1
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+# pre-commit 钩子：提交前静态检查 + 密钥扫描
+# 安装：pip install pre-commit && pre-commit install
+# 运行：pre-commit run --all-files
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        files: ^agent4som/.*\.py$
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks

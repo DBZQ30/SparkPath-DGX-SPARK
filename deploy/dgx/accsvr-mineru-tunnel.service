@@ -1,0 +1,26 @@
+[Unit]
+Description=SSH forward tunnel to acc-svr MinerU (:8005)
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/dgx/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 正向隧道：dgx 127.0.0.1:8005 -> acc-svr <GPU_HOST_IP>:8005（MinerU 旧版 /file_parse）
+# 与 knowledge_base/ingestion/parsers.py 的 MINERU_URL 默认值一致，代码零改动。
+# dgx 本地不起 MinerU（统一内存紧张），PDF 通道走 acc-svr。
+ExecStart=/usr/bin/autossh -M 0 -N \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=3 \
+  -o ExitOnForwardFailure=yes \
+  -o BatchMode=yes \
+  -o StrictHostKeyChecking=accept-new \
+  -o TCPKeepAlive=yes \
+  -L 127.0.0.1:8005:<GPU_HOST_IP>:8005 \
+  root@<ACC_SVR_IP>
+Restart=always
+RestartSec=10
+Environment=AUTOSSH_GATETIME=0
+
+[Install]
+WantedBy=default.target

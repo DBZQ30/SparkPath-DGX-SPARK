@@ -1,0 +1,132 @@
+/* pages/plan-manage/plan-manage.wxss —— 培养方案管理（009，管理员）
+   「学籍台账」视觉系统：颜色走令牌、单一强调色、无阴影。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.title-flat { margin-bottom: 0; }
+
+/* ── 上传表单 ── */
+.picker-gap { margin-top: 20rpx; }
+.upload-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin-top: 24rpx;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 14rpx;
+  background: var(--ink);
+  color: #fff;
+  font-size: var(--fs-body-lg);
+  font-weight: 600;
+}
+.upload-btn::after { border: none; }
+.upload-btn:active { opacity: .85; }
+
+/* ── 已收录方案 ── */
+.plan-list { margin-top: 20rpx; }
+.plan-row { padding: 20rpx 0; }
+.plan-row + .plan-row { border-top: 1rpx solid var(--line); }
+.plan-main { display: flex; align-items: center; gap: 16rpx; }
+.plan-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+.plan-sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+.plan-prereq {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+}
+.plan-prereq-todo { color: var(--amber); }
+
+/* ── 解析队列 ── */
+.summary-bar { margin-top: 8rpx; }
+.summary-text {
+  display: block;
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+.progress-gap { margin-top: 12rpx; }
+.queue-list { margin-top: 20rpx; }
+.queue-row { padding: 20rpx 0; }
+.queue-row + .queue-row { border-top: 1rpx solid var(--line); }
+.queue-head { display: flex; align-items: center; gap: 16rpx; }
+.queue-major {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+.queue-desc {
+  display: block;
+  margin-top: 8rpx;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+/* ── 先修校对 ── */
+.review-img {
+  width: 100%;
+  margin: 16rpx 0 20rpx;
+  border-radius: var(--r-sm);
+  border: 1rpx solid var(--line);
+}
+.edge-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 4rpx 0 16rpx;
+}
+.edge-list { margin-bottom: 12rpx; }
+.edge-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  min-height: 64rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.edge-row:last-child { border-bottom: none; }
+.edge-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+/* ── 卡片内空态 ── */
+.card-empty {
+  padding: 32rpx 0;
+  text-align: center;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}

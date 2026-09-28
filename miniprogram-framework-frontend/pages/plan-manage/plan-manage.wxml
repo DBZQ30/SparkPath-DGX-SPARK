@@ -1,0 +1,106 @@
+<view class="page">
+  <view wx:if="{{!enabled}}" class="ui-empty">培养方案管理功能未启用</view>
+
+  <block wx:else>
+    <!-- 上传区 -->
+    <view class="ui-card ui-card-pad">
+      <view class="ui-title">上传培养方案</view>
+      <view class="ui-note">本页上传仅用于「培养方案解读」（与学业预警相互独立，需各自上传）</view>
+      <view class="ui-pickers picker-gap">
+        <picker class="ui-picker-wrap" mode="selector" range="{{majors}}" value="{{majorIndex}}" bindchange="onMajorChange">
+          <view class="ui-picker">
+            <text class="ui-picker-k">专业</text>
+            <text class="ui-picker-v">{{majors[majorIndex]}}</text>
+            <view class="ic ic-sm ic-chevdown"></view>
+          </view>
+        </picker>
+        <picker class="ui-picker-wrap" mode="selector" range="{{years}}" value="{{yearIndex}}" bindchange="onYearChange">
+          <view class="ui-picker">
+            <text class="ui-picker-k">年级</text>
+            <text class="ui-picker-v">{{years[yearIndex]}}</text>
+            <view class="ic ic-sm ic-chevdown"></view>
+          </view>
+        </picker>
+      </view>
+      <button class="upload-btn" loading="{{uploading}}" bindtap="tapUpload">
+        {{uploading ? '上传中…' : '选择 docx 上传'}}
+      </button>
+    </view>
+
+    <!-- 已收录方案（含先修校对入口） -->
+    <view class="ui-card ui-card-pad">
+      <view class="ui-title">已收录方案</view>
+      <view class="ui-note">先修关系须逐条校对后学生才可见；点「校对先修关系」对照官方原图勾选。</view>
+      <view class="plan-list">
+        <view wx:for="{{plans}}" wx:key="id" class="plan-row">
+          <view class="plan-main">
+            <text class="plan-name">{{item.major}} · {{item.entry_year}}</text>
+            <text class="plan-state ui-tag ui-tag-ok">{{item.stateText}}</text>
+          </view>
+          <view class="plan-sub">
+            <text class="plan-prereq {{item.needReview ? 'plan-prereq-todo' : ''}}">{{item.prereqText}}</text>
+            <view wx:if="{{item.status === 'done' && item.prereq_total}}"
+                  class="ui-pill ui-pill-primary" data-major="{{item.major}}" data-year="{{item.entry_year}}"
+                  bindtap="tapReview">校对先修关系</view>
+          </view>
+        </view>
+        <view wx:if="{{!plans.length}}" class="card-empty">尚无已上传方案</view>
+      </view>
+    </view>
+
+    <!-- 批量解析进度 -->
+    <view class="ui-card ui-card-pad">
+      <view class="ui-title">解析队列</view>
+      <view wx:if="{{summary}}" class="summary-bar">
+        <text class="summary-text">总 {{summary.total}} · 完成 {{summary.done}} ·
+          解析中 {{summary.parsing}} · 排队 {{summary.queued}} · 失败 {{summary.failed}}</text>
+        <view class="ui-progress progress-gap">
+          <view class="ui-progress-fill"
+                style="width:{{summary.total ? (summary.done * 100 / summary.total) : 0}}%"></view>
+        </view>
+      </view>
+      <view class="queue-list">
+        <view wx:for="{{items}}" wx:key="id" class="queue-row">
+          <view class="queue-head">
+            <text class="queue-major">{{item.major}} · {{item.entry_year}}</text>
+            <view wx:if="{{item.state === 'failed'}}" class="ui-pill ui-pill-danger"
+                  data-id="{{item.id}}" bindtap="tapRetry">重试</view>
+          </view>
+          <text class="queue-desc">{{item.desc}}</text>
+        </view>
+        <view wx:if="{{!items.length}}" class="card-empty">当前无进行中的解析任务</view>
+      </view>
+    </view>
+
+    <!-- 先修关系校对（原图对照） -->
+    <view wx:if="{{reviewMajor}}" class="ui-card ui-card-pad">
+      <view class="ui-between">
+        <view class="ui-title title-flat">先修关系校对 · {{reviewMajor}} {{reviewYear}}</view>
+        <view class="ui-icon-btn" bindtap="closeReview">
+          <view class="ic ic-sm ic-close"></view>
+        </view>
+      </view>
+      <view class="ui-note">对照下方官方原图，勾选图中真实存在的先修关系后提交确认</view>
+      <image wx:if="{{reviewImg}}" class="review-img" src="{{reviewImg}}"
+             mode="widthFix" show-menu-by-longpress />
+      <view wx:if="{{edges.length}}" class="edge-toolbar">
+        <text class="ui-note">共 {{edges.length}} 条</text>
+        <view class="ui-pill ui-pill-primary" bindtap="toggleSelectAll">
+          {{allChecked ? '取消全选' : '全选'}}
+        </view>
+      </view>
+      <view class="edge-list">
+        <view wx:for="{{edges}}" wx:key="index" class="edge-row"
+              data-idx="{{index}}" bindtap="onEdgeCheck">
+          <view class="ui-check {{item._checked || item.verified ? 'ui-check-on' : ''}}">
+            {{(item._checked || item.verified) ? '✓' : ''}}
+          </view>
+          <text class="edge-text">{{item.from}} → {{item.to}}</text>
+        </view>
+        <view wx:if="{{!edges.length}}" class="card-empty">该方案暂无可校对的先修关系</view>
+      </view>
+      <button wx:if="{{edges.length}}" class="upload-btn" loading="{{verifying}}"
+              bindtap="submitVerify">提交已勾选的先修关系</button>
+    </view>
+  </block>
+</view>

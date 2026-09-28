@@ -1,0 +1,49 @@
+<view class="page">
+  <view class="head">
+    <text class="ui-note">学籍信息由「电话白名单 → 导入学生信息」上传，共 {{count}} 条</text>
+    <view class="ui-search">
+      <view class="ic ic-sm ic-search"></view>
+      <input class="ui-search-input" value="{{keyword}}" bindinput="onSearch"
+             placeholder="搜索姓名 / 学号 / 手机号" confirm-type="search" bindconfirm="tapSearch" />
+      <view wx:if="{{keyword}}" class="ui-search-clear" bindtap="clearSearch">
+        <view class="ic ic-sm ic-close"></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="ui-empty ui-note-danger" bindtap="_load">加载失败，点击重试</view>
+  <view wx:elif="{{count === 0}}" class="ui-empty">暂无学籍信息，请先在「电话白名单」导入学生信息</view>
+  <view wx:else class="ui-list">
+    <view wx:for="{{items}}" wx:key="student_id" class="ui-item" data-id="{{item.student_id}}" bindtap="tapEdit">
+      <view class="ui-item-main">
+        <view class="ui-item-row"><text class="ui-item-title">{{item.main}}</text></view>
+        <text wx:if="{{item.sub}}" class="ui-item-sub">{{item.sub}}</text>
+      </view>
+      <view class="ui-pill">编辑</view>
+    </view>
+  </view>
+
+  <!-- 编辑弹层 -->
+  <view wx:if="{{editing}}" class="ui-sheet-mask" bindtap="tapCancelEdit" catchtouchmove="noop">
+    <view class="ui-sheet sheet-tall" catchtap="noop">
+      <view class="ui-sheet-head">
+        <text class="ui-sheet-title title-flat">编辑学籍信息</text>
+        <view class="ui-sheet-close" bindtap="tapCancelEdit">
+          <view class="ic ic-sm ic-close"></view>
+        </view>
+      </view>
+      <text class="ui-note">学号（{{editStudentId}}）为主键，不可修改。</text>
+      <scroll-view class="sheet-body" scroll-y>
+        <view wx:for="{{editFields}}" wx:key="key" class="ui-field">
+          <text class="ui-field-label">{{item.label}}</text>
+          <input class="ui-input" value="{{item.value}}" data-index="{{index}}" bindinput="onField" />
+        </view>
+      </scroll-view>
+      <view class="ui-sheet-actions">
+        <button class="ui-btn ui-btn-ghost" bindtap="tapCancelEdit">取消</button>
+        <button class="ui-btn ui-btn-primary" bindtap="tapSave" loading="{{saving}}">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,24 @@
+[Unit]
+Description=SOM Audit Log Retention Cleanup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som
+ExecStart=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/scripts/cleanup_audit.sh
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ReadWritePaths=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/data
+PrivateDevices=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictRealtime=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes

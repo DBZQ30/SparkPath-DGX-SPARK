@@ -1,0 +1,175 @@
+<view class="page">
+  <text class="ui-note">管理员 · 上传数据文件并触发计算</text>
+
+  <view wx:if="{{!enabled}}" class="ui-banner ui-banner-danger">
+    选课预警功能未配置（WARNING_API_BASE 为空），请联系管理员。
+  </view>
+
+  <block wx:if="{{enabled}}">
+    <!-- ── 年级分区 tab（v6：全部数据按年级重载；＋添加年级；长按年级移出列表）── -->
+    <view class="grade-tabs">
+      <view wx:for="{{grades}}" wx:key="*this"
+            class="ui-chip {{activeGrade === item ? 'grade-active' : ''}}"
+            data-grade="{{item}}" bindtap="tapGrade" bindlongpress="tapDeleteGrade">{{item}}</view>
+      <view class="ui-chip grade-add" bindtap="tapAddGrade">＋ 添加</view>
+    </view>
+    <text class="ui-note">长按年级可移出列表（仅移出注册表，历史数据保留）</text>
+
+    <!-- ── 学期配置状态行（v6.3：仅选中年级有数据时显示；需勾当前学期 + 成绩覆盖到 + 确认钮）── -->
+    <view wx:if="{{semState}}" class="ui-card sem-row">
+      <view class="ui-item">
+        <view class="ui-item-main"><text class="ui-item-title">当前学期</text></view>
+        <picker mode="selector" range="{{semOptions}}" value="{{semIdx}}" bindchange="onSemChange">
+          <view class="ui-pill row-pill">
+            <text>{{semLabel}}</text>
+            <view class="ic ic-sm ic-chevdown"></view>
+          </view>
+        </picker>
+      </view>
+      <view class="ui-item">
+        <view class="ui-item-main"><text class="ui-item-sub">成绩覆盖到：{{coveredLabel}}</text></view>
+        <view wx:if="{{needConfirm}}" class="ui-pill ui-pill-warn" bindtap="onConfirmSem">确认 {{prevSem}} 已出成绩</view>
+      </view>
+    </view>
+
+    <!-- ── 上传模块（v1.7：培养方案/成绩单按专业分区，每专业子按钮每次 1 份）── -->
+    <view class="ui-section">上传数据文件（从聊天/传输助手选择）</view>
+    <view wx:for="{{modules}}" wx:key="hint" class="ui-card module-card">
+      <view class="ui-ico">
+        <view class="ic {{item.hint === '学籍名单' ? 'ic-person' : item.hint === '培养方案' ? 'ic-plan' : item.hint === '选课结果' ? 'ic-route' : item.hint === '成绩单' ? 'ic-file' : 'ic-archive'}}"></view>
+      </view>
+      <view class="module-body">
+        <text class="module-label">{{item.hint}}</text>
+        <text class="module-desc">{{item.desc}}</text>
+        <view wx:if="{{item.majors}}" class="major-btns">
+          <view wx:for="{{item.majors}}" wx:for-item="m" wx:key="*this"
+                class="ui-pill major-btn" data-hint="{{item.hint}}"
+                data-major="{{m}}" data-ext="{{item.ext}}"
+                bindtap="tapChoose">{{m}}</view>
+        </view>
+      </view>
+      <view wx:if="{{!item.majors}}" class="ui-pill ui-pill-primary upload-btn"
+            data-hint="{{item.hint}}" data-ext="{{item.ext}}"
+            bindtap="tapChoose">选择文件</view>
+    </view>
+
+    <!-- 逐文件上传结果（状态机：上传中[进度] → 解析入库中 → 成功/失败/后台解析中） -->
+    <view wx:if="{{uploadLog.length}}" class="upload-log">
+      <view wx:for="{{uploadLog}}" wx:key="id" class="ui-card log-item {{item.state}}">
+        <view class="log-line">
+          <text class="log-name">{{item.name}}</text>
+          <text class="log-msg {{item.state === 'done' ? 'log-ok' : (item.state === 'failed' ? 'log-fail' : (item.state === 'pending' ? 'log-pending' : 'log-progress'))}}">
+            {{item.state === 'uploading' ? ('上传中 ' + item.progress + '%') :
+              (item.state === 'parsing' ? '解析入库中…' :
+              (item.state === 'pending' ? item.msg : (item.ok ? '成功' : item.msg)))}}
+          </text>
+          <view wx:if="{{item.state === 'failed'}}" class="ui-pill ui-pill-danger log-retry"
+                data-id="{{item.id}}" bindtap="tapRetry">重试</view>
+        </view>
+        <view wx:if="{{item.state === 'uploading'}}" class="ui-progress log-bar">
+          <view class="ui-progress-fill" style="width: {{item.progress}}%"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 文件状态（v1.7 分组：标准专业行 + 其他区 + 缺专业提示）── -->
+    <view class="ui-section">已上传文件</view>
+    <view wx:if="{{missingTip}}" class="ui-banner ui-banner-warn missing-tip">{{missingTip}}</view>
+    <view wx:for="{{files}}" wx:key="file_type" class="status-group">
+      <view class="ui-group-label group-title">{{item.type_name}}</view>
+      <view class="ui-list">
+        <view wx:for="{{item.items}}" wx:for-item="f" wx:key="major" class="ui-item status-row">
+          <view class="status-line">
+            <text wx:if="{{f.major}}" class="status-major {{f.majorIsStandard ? '' : 'major-other'}}">
+              {{f.majorIsStandard ? f.major : '其他·' + f.major}}
+            </text>
+            <text class="status-file {{f.file_name ? '' : 'status-empty'}}">{{f.file_name || '未上传'}}</text>
+          </view>
+          <view wx:if="{{f.file_name}}" class="status-right">
+            <text class="ui-tag {{f.parsed_status === 'done' ? 'parse-ok' : (f.parsed_status === 'parsing' ? 'parse-pending' : 'parse-bad')}}">
+              {{f.parsed_status === 'done' ? '已解析' : (f.parsed_status === 'parsing' ? '解析中…' : '解析失败')}}
+            </text>
+            <text class="status-time">{{f.upload_time}}</text>
+            <view class="ui-pill ui-pill-danger status-del" data-ftype="{{item.file_type}}"
+                  data-major="{{f.major}}" bindtap="tapDelete">删除</view>
+          </view>
+          <text wx:if="{{f.error}}" class="ui-note-danger status-error">{{f.error}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 选课检查（2026-08-31 方向重构：上传选课后自动检查 + 手动重跑）── -->
+    <view class="ui-section">选课检查</view>
+    <view class="check-actions">
+      <button class="ui-btn ui-btn-primary trigger-btn" bindtap="tapRunCheck" disabled="{{loading}}">
+        {{loading ? '检查中...' : '运行选课检查'}}
+      </button>
+      <button class="ui-btn ui-btn-ghost export-btn" bindtap="tapExport" disabled="{{downloading || !hasCheck}}">
+        {{downloading ? '下载中...' : '下载报告'}}
+      </button>
+    </view>
+    <view wx:if="{{checkSummary}}" class="ui-banner ui-banner-info summary-card">
+      <text class="summary-text">{{checkSummary}}</text>
+    </view>
+
+    <!-- ── 未选课警示卡片（v6.5：名单内在籍在校但本学期无选课记录者，人工联系核实）── -->
+    <view wx:if="{{notSelectedCount}}" class="ui-banner ui-banner-danger absent-card">
+      <text class="absent-title">{{notSelectedCount}} 名在籍学生本学期未选课，请核对（休学/交流/联系确认）</text>
+      <view wx:for="{{notSelected}}" wx:key="student_id" class="absent-row">
+        <text>{{item.name}}</text><text class="absent-id">{{item.student_id}}</text>
+        <text class="absent-major">{{item.major}} {{item.class_name}}</text>
+      </view>
+    </view>
+
+    <!-- ── 豁免课程警告卡片（v6：全员无成绩已豁免，显著通知管理员核对）── -->
+    <view wx:if="{{hasExempt}}" class="ui-banner ui-banner-warn exempt-card">
+      <text class="exempt-title">以下课程因全员无成绩已从应修中豁免，请核对是否成绩未出/课程名差异</text>
+      <view wx:for="{{exemptList}}" wx:key="major" class="exempt-major">
+        <text class="exempt-major-name">{{item.major}}：</text>
+        <text class="exempt-names">{{item.names}}</text>
+      </view>
+    </view>
+
+    <!-- ── 检查名单 ── -->
+    <view class="ui-section">选课检查名单（{{checkCount}} 人）</view>
+    <view wx:if="{{!hasCheck}}" class="ui-empty">请先上传选课结果文件，上传后自动检查</view>
+    <view wx:elif="{{!checkCount}}" class="ui-empty">暂无提醒，当前选课符合培养计划</view>
+    <view wx:else class="ui-list">
+      <view wx:for="{{checkList}}" wx:key="student_id" class="ui-item student-row">
+        <view class="ui-item-main">
+          <view class="ui-item-row">
+            <text class="ui-item-title student-name">{{item.name}}</text>
+            <text class="student-id">{{item.student_id}}</text>
+          </view>
+          <text class="ui-item-sub">{{item.major}} {{item.class_name}}</text>
+          <view wx:if="{{item.summary.length}}" class="sr-chips">
+            <text wx:for="{{item.summary}}" wx:key="text" wx:for-item="c"
+                  class="ui-tag {{c.cls}}">{{c.text}}</text>
+          </view>
+        </view>
+        <view class="ui-pill ui-pill-primary reason-btn" data-index="{{index}}" bindtap="tapReason">详情</view>
+      </view>
+    </view>
+
+    <!-- ── 豁免记录（v7：双类型记录 + 撤销入口；折叠默认收起）── -->
+    <view wx:if="{{waiverList.length}}" class="ui-card waiver-card">
+      <view class="ui-fold waiver-head" bindtap="toggleWaivers">
+        <text class="ui-fold-title">豁免记录（{{waiverList.length}}）</text>
+        <text class="ui-fold-arrow">{{waiversOpen ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+      <text wx:if="{{!waiversOpen}}" class="ui-note waiver-hint">
+        豁免/认可以下次运行选课检查生效，点此查看与撤销
+      </text>
+      <block wx:if="{{waiversOpen}}">
+        <view wx:for="{{waiverList}}" wx:key="id" class="ui-item waiver-row">
+          <view class="ui-item-main">
+            <text class="waiver-label">{{item.label}}</text>
+            <text wx:if="{{item.sub}}" class="ui-item-sub">{{item.sub}}</text>
+            <text class="ui-item-sub">{{item.who}} · {{item.time}}</text>
+          </view>
+          <view class="ui-pill ui-pill-danger waiver-del" data-id="{{item.id}}" bindtap="waiverDelete">撤销</view>
+        </view>
+      </block>
+    </view>
+  </block>
+</view>

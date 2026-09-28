@@ -1,0 +1,15 @@
+[Unit]
+Description=vLLM Inference Server (Qwen3-VL-8B)
+After=network.target nvidia-persistenced.service
+
+[Service]
+Type=simple
+User=<DEPLOY_USER>
+Group=<DEPLOY_USER>
+ExecStart=/usr/local/bin/start-vllm.sh
+Restart=always
+RestartSec=30
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

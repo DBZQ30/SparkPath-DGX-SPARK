@@ -1,0 +1,32 @@
+{
+  "name": "miniprogram",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "engines": {
+    "node": ">=16.7"
+  },
+  "scripts": {
+    "switch": "node scripts/switch-instance.js",
+    "release": "node scripts/release.js",
+    "test": "node scripts/validate.js && node scripts/validate-ui.js && jest",
+    "test:unit": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "miniprogram-ci": "^2.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": ["<rootDir>/tests/unit"],
+    "setupFiles": ["<rootDir>/tests/setup.js"],
+    "transform": {},
+    "moduleNameMapper": {
+      "^(?:\\.\\./(?:\\./)*)config/instance$": "<rootDir>/tests/fixtures/instance.js",
+      "^\\.\\/instance$": "<rootDir>/tests/fixtures/instance.js"
+    }
+  }
+}

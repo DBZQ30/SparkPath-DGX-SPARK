@@ -1,0 +1,23 @@
+[Unit]
+Description=SOM Knowledge Base Daily Backup
+After=chroma-server.service
+
+[Service]
+Type=oneshot
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som
+ExecStart=/bin/bash /home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/scripts/backup_kb.sh
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ReadWritePaths=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/data
+PrivateDevices=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictRealtime=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes

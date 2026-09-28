@@ -1,0 +1,52 @@
+<view class="page">
+  <text class="ui-note">定时抓取教务处教学通知并入库，展示每次运行结果</text>
+
+  <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="ui-empty" bindtap="_load">
+    <text class="ui-note-danger">加载失败，点击重试</text>
+  </view>
+  <view wx:elif="{{jobMissing}}" class="ui-empty">同步任务未注册，请联系运维</view>
+  <block wx:else>
+    <view class="ui-card">
+      <view class="ui-item">
+        <view class="ui-item-main"><text class="ui-item-title">定时同步</text></view>
+        <switch checked="{{enabled}}" bindchange="onToggle" color="#17324D" />
+      </view>
+      <view class="ui-item">
+        <view class="ui-item-main"><text class="ui-item-title">每日时间</text></view>
+        <picker mode="time" value="{{scheduleTime}}" bindchange="onPickTime">
+          <view class="ui-pill row-pill">
+            <text>{{scheduleTime || '未知'}}</text>
+            <view class="ic ic-sm ic-chevdown"></view>
+          </view>
+        </picker>
+      </view>
+      <view class="ui-item" wx:if="{{enabled}}">
+        <view class="ui-item-main"><text class="ui-item-title">下次运行</text></view>
+        <text class="ui-item-sub row-val">{{nextRunAt || '—'}}（北京时间）</text>
+      </view>
+
+      <view class="ui-card-pad-sm run-wrap">
+        <button class="ui-btn ui-btn-primary run-btn" bindtap="tapRun" disabled="{{running}}">
+          {{running ? '正在同步…' : '立即同步'}}
+        </button>
+        <text wx:if="{{statusText}}" class="ui-banner {{statusTone}} run-status">{{statusText}}</text>
+      </view>
+    </view>
+
+    <view class="ui-section">最近运行</view>
+    <view wx:if="{{recentRuns.length === 0}}" class="ui-empty">暂无运行记录</view>
+    <view wx:else class="ui-list">
+      <view wx:for="{{recentRuns}}" wx:key="run_id" class="ui-item">
+        <view class="ui-item-main">
+          <view class="ui-item-row">
+            <text class="ui-item-title">{{item.timeText}}</text>
+            <text class="ui-tag {{item.tone}}">{{item.resultText}}</text>
+          </view>
+          <text wx:if="{{item.error}}" class="ui-item-sub">{{item.error}}</text>
+          <text wx:if="{{item.manual}}" class="ui-item-sub">手动触发</text>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

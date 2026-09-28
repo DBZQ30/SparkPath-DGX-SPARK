@@ -1,0 +1,131 @@
+{
+  "skill_name": "training-plan-interpretation",
+  "evals": [
+    {
+      "id": "tpi-pos-need-grade-ask",
+      "prompt": "我是工商管理专业新生，帮我解读一下我们专业的培养方案",
+      "expected_output": "专业已知（工商管理）但年级未说明 → 必须先反问年级，并列出该专业已收录年级（2023级）；年级确认前不输出任何解读内容。",
+      "assertions": [
+        "回复中询问用户想看的年级",
+        "列出该专业已收录年级（2023级）",
+        "未在年级未确认时输出四段解读、未输出任何学分数字",
+        "未擅自用其他年级替换用户未指定的年级"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": "trainingplan.cli interpret --major 工商管理"
+    },
+    {
+      "id": "tpi-pos-major-missing-ask",
+      "prompt": "帮我解读一下培养方案",
+      "expected_output": "专业与年级都缺失 → 必须先询问专业（可给出四个标准专业：工商管理 / 工业工程 / 会计学（ACCA）/ 大数据管理与应用），专业确认前不输出任何解读内容、不调用 interpret 命令。",
+      "assertions": [
+        "回复中询问用户想了解哪个专业的培养方案",
+        "列出至少两个可选标准专业名",
+        "未执行 interpret 命令、未输出任何学分数字",
+        "明确表示需要先知道专业才能解读"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": null
+    },
+    {
+      "id": "tpi-pos-both-given-ok",
+      "prompt": "给我看一下2023级大数据管理与应用的培养方案",
+      "expected_output": "专业与年级都明确 → 直接输出四段摘要（大数据管理与应用：毕业总学分 142+8，课程教学 124/集中实践 18/课外实践 8），无需再反问。",
+      "assertions": [
+        "未再反问专业或年级，直接解读",
+        "调用了 `python -m trainingplan.cli interpret --major 大数据管理与应用 --entry-year 2023`",
+        "列出毕业总学分为 142+8",
+        "未臆造数字"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": "trainingplan.cli interpret --major 大数据管理与应用 --entry-year 2023"
+    },
+    {
+      "id": "tpi-pos-explicit-grade-unavailable",
+      "prompt": "2025级大数据的培养方案帮我看看",
+      "expected_output": "专业+年级都给了，但 2025 级未收录 → 原样回报『大数据管理与应用 2025级 的培养方案尚未收录』并列出已收录年级（2023级）；不得把 2023 级当作 2025 级输出。",
+      "assertions": [
+        "回报『尚未收录』类提示",
+        "说明目前已收录的年级（2023级）",
+        "未用 2023 级方案冒充 2025 级",
+        "未臆造 2025 级任何学分数字"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": "trainingplan.cli interpret --major 大数据管理与应用 --entry-year 2025"
+    },
+    {
+      "id": "tpi-pos-prereq-explained",
+      "prompt": "培养方案里的先修关系我看不懂，帮我解释一下",
+      "expected_output": "说明先修关系来自培养方案《专业课程先修关系图》，由系统自动抽取后须经管理员逐条校对才展示；若尚未校对，说明当前『待管理员校对，暂不展示』，并引导到解读页查看已校对的关键前导链。",
+      "assertions": [
+        "说明先修关系的来源是培养方案中的先修关系图",
+        "说明未校对的内容不会展示给学生的规则",
+        "引导到『培养方案解读』页查看",
+        "未编造具体的先修课程对"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": null
+    },
+    {
+      "id": "tpi-doc-both-required",
+      "prompt": "只读 skill 文档回答，不要执行任何命令：专业和年级里如果有一个没给，这个 skill 应该怎么做？会自动挑一个年级吗？",
+      "expected_output": "专业与年级缺一不可：任一缺失都必须反问用户（专业缺失询问想了解哪个专业；年级缺失询问年级并列出已收录年级）；不会自动挑年级，也不得用其他年级冒充用户指定的年级。",
+      "assertions": [
+        "说明专业与年级缺一都必须反问",
+        "说明年级缺失时要列出已收录年级",
+        "明确说明不会自动挑年级",
+        "说明不得用其他年级冒充用户指定的年级"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": null
+    },
+    {
+      "id": "tpi-doc-graduation-conditions",
+      "prompt": "只读 skill 文档回答，不要执行任何命令：这个 skill 在什么情况下不应该被使用？另外请说明先修关系为什么有时候不展示。",
+      "expected_output": "不应使用的场景：学业预警/选课合理性检查（走 academic-warning）、成绩/绩点/排名查询、上传培养方案文件（走小程序「培养方案管理」页）、个人化学分缺口。先修关系不展示的原因：自动抽取的结果须经管理员逐条校对后才展示给学生，未校对时明确说明『待管理员校对，暂不展示』，这是设计约定而非数据缺失。",
+      "assertions": [
+        "提到学业预警/选课合理性检查不属于本 skill",
+        "提到成绩/绩点/排名查询不属于本 skill",
+        "提到上传文件走小程序「培养方案管理」页",
+        "解释先修关系需经管理员校对后才展示",
+        "明确说明未校对时不展示是设计约定、不是数据缺失"
+      ],
+      "expected_skill": "training-plan-interpretation",
+      "expected_script": null
+    },
+    {
+      "id": "tpi-neg-warning-check",
+      "prompt": "帮我跑一下2023级的选课检查，看看我选课合不合理",
+      "expected_output": "这属于学业预警/选课合理性检查，不属于本 skill；应转由 academic-warning 处理，不调用 trainingplan 命令。",
+      "assertions": [
+        "未调用 trainingplan.cli 的任何命令",
+        "识别为学业预警/选课合理性检查场景"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    },
+    {
+      "id": "tpi-neg-score-query",
+      "prompt": "我上学期高等数学考了多少分？绩点是多少？",
+      "expected_output": "成绩/绩点查询不属于本 skill（培养方案解读只讲方案要求，不含个人成绩），应引导到相应流程。",
+      "assertions": [
+        "未调用 trainingplan.cli 的命令",
+        "明确成绩/绩点查询不在培养方案解读范围内"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    },
+    {
+      "id": "tpi-neg-upload-file",
+      "prompt": "我把我们专业的培养方案docx发给你，帮我上传到系统里",
+      "expected_output": "培养方案上传不在对话内完成，应由管理员在小程序「培养方案管理」页上传，本 skill 不上传文件。",
+      "assertions": [
+        "未调用 trainingplan.cli upload",
+        "说明上传走小程序「培养方案管理」页",
+        "说明本 skill 只做解读、不做上传"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

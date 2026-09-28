@@ -1,0 +1,35 @@
+[Unit]
+Description=ChromaDB Vector Database Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som
+EnvironmentFile=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/.env
+Environment="PATH=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/venv/bin:/usr/bin:/bin"
+Environment="IS_PERSISTENT=1"
+Environment="PERSIST_DIRECTORY=data/chroma"
+Environment="CHROMA_SERVER_HOST=127.0.0.1"
+Environment="CHROMA_SERVER_HTTP_PORT=8007"
+ExecStart=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/venv/bin/uvicorn chromadb.app:app --host 127.0.0.1 --port 8007
+Restart=always
+RestartSec=5
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ReadWritePaths=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/data
+PrivateDevices=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictRealtime=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+MemoryMax=2G
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

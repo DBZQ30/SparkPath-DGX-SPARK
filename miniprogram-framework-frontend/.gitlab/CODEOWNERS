@@ -1,0 +1,25 @@
+# GitLab CODEOWNERS —— 路径级代码所有权（MR 自动指派评审人）
+#
+# 使用前提：
+#   1. GitLab 版本 ≥ 13.2（CODEOWNERS 支持）
+#   2. 把下面的 <xxx>-dev 占位符替换为团队实际 GitLab 用户名；有组的话建议用 @组名
+#   3. 已开启 MR 评审人自动指派
+#
+# 当前范围：本仓库只维护 1 个小程序 —— 本科新生学业规划智能助手（jwc）。
+# 原多实例（MBA/MEM/MPAcc × 招生/学位）的实例专属规则已随实例配置一并移除（2026-09）。
+
+# ── 实例专属区：本科新生学业规划智能助手 ───────────────────────
+config/instances/jwc.js            @jwc-dev
+
+pages/_ext/jwc/                    @jwc-dev
+
+assets/instances/jwc/              @jwc-dev
+
+# ── 共享区（影响全部实例）：全体开发者 ─────────────
+# 有团队组用 @组名；没有就逐个 @ 团队成员
+pages/                             @team-group
+app.js                             @team-group
+config/api.js                      @team-group
+config/instances/_default.js       @team-group
+scripts/                           @team-group
+docs/                              @team-group

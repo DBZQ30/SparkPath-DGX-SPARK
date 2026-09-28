@@ -1,0 +1,41 @@
+.worktrees/
+# Python bytecode
+__pycache__/
+*.pyc
+/venv
+data/
+data_copy/
+academicwarning/*.docx
+academicwarning/*.xlsx
+academicwarning/*.xls
+global/
+.env
+CLAUDE.md
+docs/weekly-reports/
+docs/others/
+.coverage
+coverage.json
+benchmark.md
+# SkillEvaluator 运行产物（本地评测报告 + 自动生成的 BENCHMARK.md）
+# 不提交：报告含本机路径，且会被下次运行覆盖。手写的 skill 根 BENCHMARK.md 已跟踪，不受影响。
+shared_skills/*/reports/
+
+# 注：SkillEvaluator 的评测产物现已**完全移出仓库树** → ~/work/skilleval/agent4som-skilleval-reports/
+# （原因：报告里含 Claude Code 生成的符号链接，留在仓库内会被后续轮次的 secure-copy 走查拒绝）
+
+# SkillEvaluator Tier 3 评测环境运行时（可重建）
+# 内容 = 仓库运行时副本（academicwarning 包 + cp313 依赖 + 业务库 data/warning.db），
+# 由 agent4som/scripts/build_skill_eval_env.sh 生成。含业务数据与二进制，不入库。
+shared_skills/*/evals/environment/
+academicwarning/*.png
+academicwarning/pic/*.png
+.env.bak-*
+.superpowers/
+academicwarning/docs/
+academicwarning/result/
+AGENTS.md
+
+# SkillEvaluator 报告（约定放仓库外，此处兜底防止误提交）
+skilleval-reports/
+# run_skill_eval.sh 的 --output-dir 默认值；忘记传参时会在仓库根落 reports/
+reports/

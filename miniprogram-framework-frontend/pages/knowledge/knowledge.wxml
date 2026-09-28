@@ -1,0 +1,134 @@
+<view class="page">
+  <view class="head">
+    <view class="ui-between">
+      <text class="ui-note head-sub">查看并删除已入库的文件，删除后不可撤回</text>
+      <text wx:if="{{isAdmin && mode === 'files'}}" class="ui-link head-link" bindtap="tapAudit">操作历史</text>
+    </view>
+    <text wx:if="{{quota}}" class="ui-note head-quota">已用 {{quota.used}} / {{quota.limit}}</text>
+  </view>
+
+  <view wx:if="{{noAccess}}" class="ui-empty">当前身份无法管理知识库</view>
+
+  <block wx:else>
+    <!-- 操作历史（仅管理员 / 所有者，§4.7.3） -->
+    <block wx:if="{{mode === 'audit'}}">
+      <view class="list-head">
+        <view class="ui-section list-title">操作历史（最近 {{auditEvents.length}} 条）</view>
+        <text class="ui-link head-link" bindtap="tapBackToFiles">返回文件列表</text>
+      </view>
+      <view wx:if="{{auditLoading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+      <view wx:elif="{{auditFailed}}" class="ui-empty ui-note-danger" bindtap="tapAudit">加载失败，点击重试</view>
+      <view wx:elif="{{auditEvents.length === 0}}" class="ui-empty">暂无删除记录</view>
+      <view wx:else class="ui-list">
+        <view wx:for="{{auditEvents}}" wx:key="index" class="ui-item">
+          <view class="ui-item-main">
+            <view class="ui-item-title">{{item.filename}}</view>
+            <text class="ui-item-sub">{{item.time}} · {{item.user_id}} · {{item.node_count}} 个知识片段</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <!-- 范围切换（按角色显示：个人 / 教师 / 公共） -->
+      <view class="ui-seg">
+        <view wx:for="{{scopes}}" wx:key="key"
+              class="ui-seg-item {{activeScope === item.scope ? 'ui-seg-on' : ''}}"
+              data-scope="{{item.scope}}" data-label="{{item.label}}"
+              bindtap="switchScope">{{item.label}}</view>
+      </view>
+
+      <view class="ui-search">
+        <view class="ic ic-sm ic-search"></view>
+        <input class="ui-search-input" value="{{keyword}}" bindinput="onSearch"
+               placeholder="搜索文件名称" confirm-type="search" />
+        <view wx:if="{{keyword}}" class="ui-search-clear" bindtap="clearSearch">
+          <view class="ic ic-sm ic-close"></view>
+        </view>
+      </view>
+
+      <!-- 排序：正序 / 倒序（服务端按 filename） -->
+      <view class="sort-row">
+        <text class="ui-note sort-label">排序</text>
+        <view class="ui-chips">
+          <view class="ui-chip {{sortOrder === 'asc' ? 'ui-chip-on' : ''}}"
+                data-order="asc" bindtap="setSortOrder">正序</view>
+          <view class="ui-chip {{sortOrder === 'desc' ? 'ui-chip-on' : ''}}"
+                data-order="desc" bindtap="setSortOrder">倒序</view>
+        </view>
+      </view>
+
+      <!-- 来源筛选 + 孤儿扫描（仅管理员 / 所有者） -->
+      <view wx:if="{{isAdmin}}" class="filter-row">
+        <view class="ui-chips filter-chips">
+          <view class="ui-chip {{sourceFilter === 'all' ? 'ui-chip-on' : ''}}"
+                data-v="all" bindtap="setSourceFilter">全部</view>
+          <view class="ui-chip {{sourceFilter === 'file' ? 'ui-chip-on' : ''}}"
+                data-v="file" bindtap="setSourceFilter">文件入库</view>
+          <view class="ui-chip {{sourceFilter === 'jxtz' ? 'ui-chip-on' : ''}}"
+                data-v="jxtz" bindtap="setSourceFilter">教务通知</view>
+        </view>
+        <view class="ui-pill" bindtap="tapScanOrphans">{{orphanScanning ? '扫描中…' : '扫描孤儿'}}</view>
+      </view>
+
+      <!-- 孤儿扫描结果（只列候选，删除仍走批量确认） -->
+      <block wx:if="{{orphanListed}}">
+        <view class="list-head">
+          <view class="ui-section list-title">可清理的记录（{{orphans.length}}）</view>
+          <view class="ui-pill ui-pill-danger" bindtap="tapDeleteOrphans">删除选中</view>
+        </view>
+        <view class="ui-list">
+          <view wx:for="{{orphans}}" wx:key="filename" class="ui-item"
+                data-filename="{{item.filename}}" bindtap="toggleOrphan">
+            <view class="ui-check {{item.checked ? 'ui-check-on' : ''}}">{{item.checked ? '✓' : ''}}</view>
+            <view class="ui-item-main">
+              <view class="ui-item-title">{{item.display_name}}</view>
+              <text wx:if="{{item.sub}}" class="ui-item-sub">{{item.sub}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 批量删除结果 -->
+      <view wx:if="{{batchResult}}" class="ui-card ui-card-pad">
+        <view class="ui-between">
+          <view class="ui-title title-flat">删除结果</view>
+          <view class="ui-search-clear" bindtap="closeBatchResult">
+            <view class="ic ic-sm ic-close"></view>
+          </view>
+        </view>
+        <text class="ui-note">已删除 {{batchResult.deleted}} 个{{batchResult.failed ? '，失败 ' + batchResult.failed + ' 个' : ''}}</text>
+        <text wx:for="{{batchResult.failures}}" wx:key="filename" class="ui-banner ui-banner-danger err-row">{{item.filename}}：{{item.reason}}</text>
+      </view>
+
+      <!-- 文件列表 -->
+      <view class="list-head">
+        <view class="ui-section list-title">文件（{{view.length}}）</view>
+        <view class="head-ops">
+          <text wx:if="{{view.length}}" class="ui-link head-link" bindtap="toggleSelectAll">{{allSelected ? '取消全选' : '全选'}}</text>
+          <view wx:if="{{selectedCount}}" class="ui-pill ui-pill-danger" bindtap="tapBatchDelete">删除选中（{{selectedCount}}）</view>
+        </view>
+      </view>
+      <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+      <view wx:elif="{{loadFailed}}" class="ui-empty ui-note-danger" bindtap="reload">加载失败，点击重试</view>
+      <view wx:elif="{{view.length === 0}}" class="ui-empty">{{keyword ? '无匹配结果' : '该范围还没有入库文件'}}</view>
+      <view wx:else class="ui-list">
+        <view wx:for="{{view}}" wx:key="filename" class="ui-item">
+          <view class="check-hit" data-filename="{{item.filename}}" catchtap="toggleSelect">
+            <view class="ui-check {{item.checked ? 'ui-check-on' : ''}}">{{item.checked ? '✓' : ''}}</view>
+          </view>
+          <view class="ui-item-main">
+            <view class="ui-item-row">
+              <view class="ui-item-title name-hit" data-filename="{{item.filename}}" bindtap="tapPreview">{{item.display_name}}</view>
+              <text wx:if="{{item.statusLabel}}" class="ui-tag ui-tag-warn">{{item.statusLabel}}</text>
+              <text wx:if="{{isAdmin}}" class="ui-tag {{item.source === 'jxtz' ? 'ui-tag-info' : 'ui-tag-muted'}}">{{item.sourceLabel}}</text>
+            </view>
+            <text wx:if="{{item.statusHint}}" class="ui-note ui-note-warn item-hint">{{item.statusHint}}</text>
+            <text wx:if="{{item.sub}}" class="ui-item-sub">{{item.sub}}</text>
+          </view>
+          <view class="ui-pill ui-pill-danger" data-filename="{{item.filename}}" bindtap="removeItem">删除</view>
+        </view>
+      </view>
+    </block>
+  </block>
+</view>

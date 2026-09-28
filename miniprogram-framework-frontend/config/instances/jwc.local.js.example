@@ -1,0 +1,7 @@
+// config/instances/jwc.local.js.example
+// 复制为 config/instances/jwc.local.js 并填入真实密钥（该文件已在 .gitignore 中，不会入库）。
+// 这些是前端调用学业预警 / 培养方案接口的 X-API-Key。
+module.exports = {
+  WARNING_API_KEY: '<在此填写 WARNING_API_KEY>',
+  PLAN_API_KEY: '<在此填写 PLAN_API_KEY>',
+}

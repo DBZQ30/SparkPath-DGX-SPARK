@@ -1,0 +1,14 @@
+[Unit]
+Description=Miniapp Proxy (FastAPI :8000 -> hermes :8010)
+After=hermes-gateway@jwc-assistant.service
+
+[Service]
+Type=simple
+User=<DEPLOY_USER>
+WorkingDirectory=/home/<DEPLOY_USER>/H-agent/agent4som/miniapp_proxy
+ExecStart=/home/<DEPLOY_USER>/.hermes/hermes-agent/venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

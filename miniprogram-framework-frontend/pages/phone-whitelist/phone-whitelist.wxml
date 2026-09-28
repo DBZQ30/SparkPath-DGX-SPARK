@@ -1,0 +1,136 @@
+<view class="page">
+  <view class="head">
+    <text class="ui-note">共 {{total}} 条 · 用户绑定手机号后自动获得对应身份</text>
+
+    <view class="ui-search">
+      <view class="ic ic-sm ic-search"></view>
+      <input class="ui-search-input" value="{{keyword}}" bindinput="onSearch"
+             placeholder="搜索姓名 / 手机号 / 工号" confirm-type="search" />
+      <view wx:if="{{keyword}}" class="ui-search-clear" bindtap="clearSearch">
+        <view class="ic ic-sm ic-close"></view>
+      </view>
+    </view>
+
+    <view class="btn-row">
+      <button class="ui-btn ui-btn-ghost import-btn" bindtap="tapImportStudent" disabled="{{importing}}">导入学生信息</button>
+      <button class="ui-btn ui-btn-ghost import-btn" bindtap="tapImportTeacher" disabled="{{importing}}">导入教师</button>
+      <button class="ui-btn ui-btn-ghost import-btn" bindtap="tapImportAdmin" disabled="{{importing}}">导入管理员</button>
+    </view>
+    <button class="ui-btn ui-btn-primary add-btn" bindtap="tapAdd">添加手机号</button>
+  </view>
+
+  <!-- Excel 格式说明（默认收起，点击展开） -->
+  <view class="ui-fold" bindtap="toggleHint">
+    <view class="ic ic-sm ic-info"></view>
+    <text class="ui-fold-title">Excel 格式说明</text>
+    <view class="ic ic-sm ic-chevdown ui-fold-arrow {{hintOpen ? 'fold-open' : ''}}"></view>
+  </view>
+  <view wx:if="{{hintOpen}}" class="ui-card ui-card-pad hint-body">
+    <text class="ui-note">· 学生信息：学籍信息表（学号 / 姓名 / 个人手机 及学籍字段），导入后同时写入学生档案；无手机号的行只入档案、不进白名单</text>
+    <text class="ui-note">· 教师 / 管理员：简版表（姓名 / 电话 / 工号），角色由入口固定，无需角色列</text>
+    <text class="ui-note">· 支持 .xlsx / .xls；手机号重复时以最后一行为准；数据有误的行会跳过，并在导入结果中逐行说明</text>
+    <text class="ui-note">· 名单中的手机号在用户绑定后自动获得对应身份；同一号码以最新一次上传或修改为准</text>
+  </view>
+
+  <!-- 导入结果 -->
+  <view wx:if="{{importResult}}" class="ui-card ui-card-pad">
+    <view class="ui-between">
+      <view class="ui-title title-flat">导入结果</view>
+      <view class="ui-search-clear" bindtap="closeImportResult">
+        <view class="ic ic-sm ic-close"></view>
+      </view>
+    </view>
+    <view class="ui-stats result-stats">
+      <view class="ui-stat"><text class="ui-stat-num">{{importResult.imported}}</text><text class="ui-stat-label">新增</text></view>
+      <view class="ui-stat"><text class="ui-stat-num">{{importResult.updated}}</text><text class="ui-stat-label">更新</text></view>
+      <view class="ui-stat"><text class="ui-stat-num">{{importResult.skipped}}</text><text class="ui-stat-label">跳过</text></view>
+      <view class="ui-stat"><text class="ui-stat-num ui-stat-danger">{{importResult.failed}}</text><text class="ui-stat-label">失败</text></view>
+    </view>
+    <view wx:if="{{importResult.archiveImported || importResult.archiveUpdated}}" class="ui-banner ui-banner-ok sync-row">
+      学生档案：新增 {{importResult.archiveImported}} · 更新 {{importResult.archiveUpdated}}
+    </view>
+    <view wx:if="{{importResult.roleSync}}" class="ui-banner ui-banner-ok sync-row">
+      身份已更新：{{importResult.roleSync.changed}} 人 · {{importResult.roleSync.candidates}} 人待绑定（绑定手机后自动生效）
+    </view>
+    <view wx:if="{{importResult.errors.length}}" class="import-errors">
+      <text wx:for="{{importResult.errors}}" wx:key="row" class="err-row">第 {{item.row}} 行：{{item.reason}}</text>
+    </view>
+  </view>
+
+  <!-- 导入名单（可整份删除） -->
+  <view wx:if="{{batches.length}}" class="ui-section">导入名单（{{batches.length}} 份）</view>
+  <view wx:if="{{batches.length}}" class="ui-list">
+    <view wx:for="{{batches}}" wx:key="batch_id" class="ui-item">
+      <view class="ui-item-main">
+        <view class="ui-item-row"><text class="ui-item-title">{{item.label || '未命名名单'}}</text></view>
+        <text class="ui-item-sub">{{item.count}} 条 · {{item.created_at}}</text>
+      </view>
+      <view class="ui-pill ui-pill-danger" data-batch-id="{{item.batch_id}}" data-label="{{item.label}}"
+            bindtap="removeBatch">删除</view>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list-head">
+    <view class="ui-section list-title">白名单（{{total}} 条）</view>
+    <text wx:if="{{keyword}}" class="ui-note">匹配 {{matchCount}} / 共 {{total}} 条</text>
+  </view>
+  <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="ui-empty ui-note-danger" bindtap="_load">加载失败，点击重试</view>
+  <view wx:elif="{{total === 0}}" class="ui-empty">名单为空，可导入 Excel 或点「添加手机号」</view>
+  <view wx:elif="{{view.length === 0}}" class="ui-empty">无匹配结果</view>
+  <view wx:else class="ui-list">
+    <view wx:for="{{view}}" wx:key="phone" class="ui-item">
+      <view class="ui-item-main">
+        <view class="ui-item-row">
+          <text class="ui-item-title">{{item.main}}</text>
+          <text class="ui-tag {{item.roleChip}}">{{item.roleLabel}}</text>
+        </view>
+        <text wx:if="{{item.sub}}" class="ui-item-sub">{{item.sub}}</text>
+      </view>
+      <view class="ui-pill ui-pill-danger" data-phone="{{item.phone}}" bindtap="removeItem">删除</view>
+    </view>
+  </view>
+
+  <!-- 添加（Bottom Sheet） -->
+  <view wx:if="{{showForm}}" class="ui-sheet-mask" bindtap="closeForm" catchtouchmove="noop"
+        style="padding-bottom: {{kbdH}}px">
+    <view class="ui-sheet" catchtap="noop">
+      <view class="ui-sheet-head">
+        <text class="ui-sheet-title title-flat">添加手机号</text>
+        <view class="ui-sheet-close" bindtap="closeForm">
+          <view class="ic ic-sm ic-close"></view>
+        </view>
+      </view>
+      <text class="ui-note">加入名单的手机号，在用户绑定后自动获得所选身份；同一号码以最新一次上传或修改为准。</text>
+      <view class="ui-field">
+        <text class="ui-field-label">手机号 *</text>
+        <input class="ui-input" type="number" maxlength="11" placeholder="11 位手机号"
+               value="{{formPhone}}" bindinput="onPhone"
+               bindkeyboardheightchange="onKbd" bindblur="onKbdHide" />
+      </view>
+      <view class="ui-field">
+        <text class="ui-field-label">工号 / 学号</text>
+        <input class="ui-input" placeholder="选填" value="{{formStaffId}}" bindinput="onStaffId"
+               bindkeyboardheightchange="onKbd" bindblur="onKbdHide" />
+      </view>
+      <view class="ui-field">
+        <text class="ui-field-label">姓名</text>
+        <input class="ui-input" placeholder="选填" value="{{formName}}" bindinput="onName"
+               bindkeyboardheightchange="onKbd" bindblur="onKbdHide" />
+      </view>
+      <view class="ui-field">
+        <text class="ui-field-label">身份</text>
+        <view class="ui-seg">
+          <view wx:for="{{roleOptions}}" wx:key="value"
+                class="ui-seg-item {{formRole === item.value ? 'ui-seg-on' : ''}}"
+                data-value="{{item.value}}" bindtap="onRole">{{item.label}}</view>
+        </view>
+      </view>
+      <view class="ui-sheet-actions">
+        <button class="ui-btn ui-btn-ghost" bindtap="closeForm">取消</button>
+        <button class="ui-btn ui-btn-primary" bindtap="submitAdd">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

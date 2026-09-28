@@ -1,0 +1,28 @@
+[Unit]
+Description=vLLM Qwen3.8-27B Inference Server (dgx, GPU) - :8000
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/gpu-services/README.md
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/<DGX_USER>
+Environment=NO_PROXY=127.0.0.1,localhost
+Environment=PATH=/home/<DGX_USER>/venvs/vllm/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=C_INCLUDE_PATH=/home/<DGX_USER>/venvs/vllm/include/python3.12
+ExecStart=/home/<DGX_USER>/venvs/vllm/bin/vllm serve /home/<DGX_USER>/models/models/Qwen--Qwen3.8-27B-FP8/snapshots/master --served-model-name qwen3.8-27b --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.75 --max-model-len 262144 --speculative-config '{"method":"mtp","num_speculative_tokens":2}' --max-num-batched-tokens 4096 --enable-auto-tool-choice --tool-call-parser qwen3_coder --reasoning-parser qwen3
+Restart=on-failure
+RestartSec=30
+TimeoutStartSec=1200
+NoNewPrivileges=yes
+PrivateTmp=yes
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

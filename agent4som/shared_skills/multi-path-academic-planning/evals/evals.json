@@ -1,0 +1,134 @@
+{
+  "skill_name": "multi-path-academic-planning",
+  "evals": [
+    {
+      "id": "plan-pos-route-science",
+      "prompt": "我是工商管理2023级的，想走科学研究型，帮我排一下四年怎么安排",
+      "expected_output": "确认专业=工商管理、年级=2023级、方向=科学研究型后，运行 `python -m trainingplan.cli route --major 工商管理 --entry-year 2023 --mode 科学研究型`，原样回报四年路线图摘要（路径规则/逐年节奏/节奏节点/压力），并附免责声明。",
+      "assertions": [
+        "调用 route 命令且 mode 为 科学研究型",
+        "回复含路径规则（研究生进阶课程替代专业选修课）与逐年节奏",
+        "回复含免责声明（建议性规划 / 以学院审批为准）",
+        "不臆造学分数字"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": "trainingplan.cli route"
+    },
+    {
+      "id": "plan-pos-mode-missing",
+      "prompt": "我是大数据2023级新生，帮我规划一下四年",
+      "expected_output": "方向未明确 → 先列出四种培养模式（常规/科学研究/交叉融合/创新创业）及差异，请用户选择后再生成路线图；不擅自替用户选方向。",
+      "assertions": [
+        "未直接假定某个方向生成路线图",
+        "列出四种培养模式并请用户选择",
+        "专业归一化为 大数据管理与应用、年级为 2023级"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": "trainingplan.cli modes"
+    },
+    {
+      "id": "plan-pos-select",
+      "prompt": "我大一（2025级）还没定专业，三个志愿该怎么填？",
+      "expected_output": "运行 `python -m trainingplan.cli select --entry-year 2025级`，回报接收计划、综合成绩构成与冲/稳/保志愿策略参考，并说明策略仅供参考、以学院公示为准。",
+      "assertions": [
+        "调用 select 命令",
+        "回复含接收计划与综合成绩构成",
+        "给出冲/稳/保志愿策略参考且注明仅供参考",
+        "不替学生决定志愿顺序"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": "trainingplan.cli select"
+    },
+    {
+      "id": "plan-pos-transfer",
+      "prompt": "我想从工商管理转到大数据管理与应用（2024级），要补多少学分？压力大不大？",
+      "expected_output": "确认目标专业后运行 `python -m trainingplan.cli simulate --from-major 工商管理 --to-major 大数据管理与应用 --entry-year 2024级`，回报可抵扣/需补修、压力与推免红线、政策要点，并附免责声明。",
+      "assertions": [
+        "调用 simulate 命令且 to-major 为 大数据管理与应用",
+        "回复含需补修学分与压力/红线（第三学年末前修完）",
+        "说明录取与学分认定以学院公示为准"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": "trainingplan.cli simulate"
+    },
+    {
+      "id": "plan-pos-compare",
+      "prompt": "工商管理2023级，四种培养模式到底有啥区别？",
+      "expected_output": "运行 `python -m trainingplan.cli compare --major 工商管理 --entry-year 2023`（或 modes），回报四方向替代规则/跨选范围对比。",
+      "assertions": [
+        "调用 compare 或 modes 命令",
+        "列出四种模式及各自的替代规则（学分/范围/申请节点）"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": "trainingplan.cli compare"
+    },
+    {
+      "id": "plan-pos-rerun",
+      "prompt": "刚才那个工商管理2023级的规划，改成交叉融合型再来一遍",
+      "expected_output": "直接用新方向重跑 route（--mode 交叉融合型），给出更新后的路线图，不沿用旧结论。",
+      "assertions": [
+        "重跑 route 且 mode 为 交叉融合型",
+        "回复为更新后的路线图（不重复旧的科学研究型结论）"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": "trainingplan.cli route"
+    },
+    {
+      "id": "plan-doc-disclaimer",
+      "prompt": "只读这个 skill 的文档回答，不要执行任何命令/脚本/网络请求：学业规划的路线图输出里，哪些节点算官方硬节点、哪些是建议？每次回复必须附带什么？",
+      "expected_output": "官方硬节点标注 ★官方（如培养模式申请：大三第二学期）；竞赛/科研/证书等为通用建议并标注「建议」；每次回复必须附免责声明「本方案为建议性规划（含通用建议，非官方硬性规定）…以学院审批与公示为准」。",
+      "assertions": [
+        "区分官方硬节点与通用建议（★官方 / 建议）",
+        "给出必须附带的免责声明要点（建议性规划、以学院审批为准）",
+        "不执行任何命令"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": null
+    },
+    {
+      "id": "plan-doc-boundary",
+      "prompt": "只读这个 skill 的文档回答，不要执行任何命令/脚本/网络请求：哪些问题不属于本 skill，应该分别走哪个 skill？",
+      "expected_output": "培养方案结构解读 → training-plan-interpretation；学业预警/选课检查 → academic-warning；成绩绩点排名查询、上传文件、代选课 → 不属于本 skill。",
+      "assertions": [
+        "指出结构解读属 training-plan-interpretation",
+        "指出学业预警/选课检查属 academic-warning",
+        "不执行任何命令"
+      ],
+      "expected_skill": "multi-path-academic-planning",
+      "expected_script": null
+    },
+    {
+      "id": "plan-neg-interpret",
+      "prompt": "帮我解读一下工商管理专业的学分结构和先修关系",
+      "expected_output": "属培养方案结构解读，应由 training-plan-interpretation 处理，本 skill 不加载。",
+      "assertions": [
+        "不调用本 skill 的规划命令",
+        "指向 training-plan-interpretation（培养方案解读）"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    },
+    {
+      "id": "plan-neg-score",
+      "prompt": "我上学期绩点和排名是多少？",
+      "expected_output": "成绩/绩点/排名查询不属于本 skill，应如实说明不在范围内。",
+      "assertions": [
+        "不调用本 skill 的规划命令",
+        "如实说明成绩/排名查询不在本 skill 范围"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    },
+    {
+      "id": "plan-neg-course-select",
+      "prompt": "帮我选一下下学期的课",
+      "expected_output": "代选课不属于本 skill；本 skill 只做规划与测算，不代选课。",
+      "assertions": [
+        "不调用本 skill 的规划命令",
+        "说明本 skill 不代选课（只做规划）"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

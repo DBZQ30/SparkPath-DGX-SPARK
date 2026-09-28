@@ -1,0 +1,20 @@
+# Claude Code local settings (machine-specific)
+.claude/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+
+# 部署密钥（GPU 模型服务统一 API Key 等）
+deploy/**/*.env
+!deploy/**/*.env.example
+
+# CodeGraph 本地索引（机器本地生成，勿入库）
+.codegraph/
+
+# Python 运行时缓存（任何目录）
+__pycache__/
+*.pyc
+
+# 评审记录（本地文件，不入库）
+REVIEW.md

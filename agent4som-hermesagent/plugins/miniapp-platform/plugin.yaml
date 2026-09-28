@@ -1,0 +1,16 @@
+name: miniapp-platform
+label: Miniapp Platform
+kind: platform
+version: 1.0.0
+description: Native Hermes platform adapter for the teaching-affairs WeChat mini program.
+author: agent4som
+requires_env:
+  - name: WECHAT_MINIAPP_APPID
+    description: WeChat mini program AppID
+    password: false
+  - name: WECHAT_MINIAPP_APPSECRET
+    description: WeChat mini program AppSecret
+    password: true
+  - name: MINIAPP_SESSION_SECRET
+    description: HMAC secret for miniapp session tokens
+    password: true

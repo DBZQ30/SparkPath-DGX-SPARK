@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily JWC Teaching Notice Sync (Midnight)
+
+[Timer]
+OnCalendar=04:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Restart GPU embedding/reranker to reset CUDA allocator high-water mark
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/gpu-services/README.md
+After=dgx-embedding.service dgx-reranker.service
+
+[Service]
+Type=oneshot
+# Unified-memory allocator ratchet fallback (see README troubleshooting notes):
+# allocator high-water mark grows with peak batch size and is never returned.
+# Chunked batching keeps steady state at ~4 GiB; nightly restart covers unknown growth paths.
+ExecStart=/bin/systemctl restart dgx-embedding.service dgx-reranker.service

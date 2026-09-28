@@ -1,0 +1,22 @@
+[Unit]
+Description=Qwen3-Embedding FastAPI Server (CPU)
+After=network.target vllm.service
+
+[Service]
+Type=simple
+User=<DEPLOY_USER>
+Group=<DEPLOY_USER>
+ExecStart=/home/miniconda3/envs/ai/bin/python3.11 /usr/local/bin/embedding_server.py
+Restart=on-failure
+RestartSec=30
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/<DEPLOY_USER>
+Environment=CUDA_VISIBLE_DEVICES=
+# 监听地址占位符：生产替换为 GPU 主机地址（如 GPU_HOST 对应 IP）
+Environment=HOST=<GPU_HOST_IP>
+# API_KEY 由 /etc/sparkpath/gpu-services.env 提供（见 gpu-services.env.example）
+EnvironmentFile=-/etc/sparkpath/gpu-services.env
+Environment=PORT=8001
+
+[Install]
+WantedBy=multi-user.target

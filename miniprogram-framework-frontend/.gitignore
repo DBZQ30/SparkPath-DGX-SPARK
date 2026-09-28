@@ -1,0 +1,21 @@
+project.private.config.json
+.agents/
+node_modules/
+miniprogram_npm/
+.DS_Store
+Thumbs.db
+
+# 多实例构建产物（由 scripts/build.js 生成，不入库）
+# 克隆后需先执行 npm run switch 生成，再导入微信开发者工具
+config/instance.js
+app.json
+project.config.json
+
+# miniprogram-ci 上传密钥（每个 AppID 一把，勿入库）
+keys/
+
+# 实例本地密钥覆盖（WARNING_API_KEY / PLAN_API_KEY 等，勿入库）
+config/instances/*.local.js
+
+# 开发者工具调试日志
+log.txt

@@ -1,0 +1,115 @@
+<view class="page">
+  <view wx:if="{{!enabled}}" class="ui-empty">培养方案解读功能未启用</view>
+
+  <block wx:else>
+    <!-- 选择区 -->
+    <view class="ui-pickers">
+      <picker class="ui-picker-wrap" mode="selector" range="{{majors}}" value="{{majors.indexOf(major)}}" bindchange="onMajorChange">
+        <view class="ui-picker">
+          <text class="ui-picker-k">专业</text>
+          <text class="ui-picker-v">{{major || '请选择'}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+      <picker class="ui-picker-wrap" mode="selector" range="{{years}}" value="{{years.indexOf(entryYear)}}" bindchange="onYearChange">
+        <view class="ui-picker">
+          <text class="ui-picker-k">年级</text>
+          <text class="ui-picker-v">{{entryYear || '请选择'}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+    <view wx:elif="{{state !== 'done'}}" class="ui-empty">{{stateText}}</view>
+
+    <block wx:else>
+      <!-- 学分结构 -->
+      <view class="ui-card ui-card-pad">
+        <view class="ui-title">四年学分结构</view>
+        <view class="total">
+          <text class="total-num ui-num">{{overview.credit_tree.credit || '—'}}</text>
+          <text class="total-unit">学分</text>
+          <text class="total-cap">毕业总学分</text>
+        </view>
+
+        <view class="bar">
+          <view wx:for="{{creditRows.rows}}" wx:key="name"
+                class="bar-seg seg-{{index}}" style="width:{{item.pct}}%"></view>
+        </view>
+        <view class="legend">
+          <view wx:for="{{creditRows.rows}}" wx:key="name" class="legend-item">
+            <view class="legend-dot seg-{{index}}"></view>
+            <text class="legend-name">{{item.name}}</text>
+            <text class="legend-val ui-num">{{item.credit}} 学分 · {{item.pct}}%</text>
+          </view>
+        </view>
+
+        <view wx:if="{{creditRows.children.length}}" class="sub-list">
+          <view wx:for="{{creditRows.children}}" wx:key="name" class="sub-row">
+            <text class="sub-name">{{item.name}}<text class="sub-count">（{{item.count}} 门）</text></text>
+            <text class="sub-val ui-num">{{item.credit}} 学分</text>
+          </view>
+        </view>
+        <view class="ui-note hint">课程总表共 {{courseCount}} 门</view>
+      </view>
+
+      <!-- 学期地图 -->
+      <view class="ui-card ui-card-pad">
+        <view class="ui-title">四年课程地图</view>
+        <scroll-view class="sem-tabs" scroll-x>
+          <view wx:for="{{semesters}}" wx:key="sem"
+                class="sem-tab {{activeSem === item.sem ? 'sem-tab-on' : ''}}"
+                data-sem="{{item.sem}}" bindtap="onSemTap">
+            <text class="sem-name">{{item.sem}}</text>
+            <text class="sem-credit">{{item.credit}}</text>
+          </view>
+        </scroll-view>
+        <view class="course-list">
+          <view wx:for="{{activeCourses}}" wx:key="course_code" class="course-row">
+            <text class="course-name">{{item.course_name}}</text>
+            <text class="course-val ui-num">{{item.credit}} 学分</text>
+          </view>
+          <view wx:if="{{!activeCourses.length}}" class="ui-note">该学期暂无推荐课程</view>
+        </view>
+      </view>
+
+      <!-- 先修关系 -->
+      <view class="ui-card ui-card-pad">
+        <view class="ui-title">课程先修关系</view>
+        <block wx:if="{{prereq.count}}">
+          <view class="chain-list">
+            <view wx:for="{{prereq.chains}}" wx:key="*this" class="chain-row">
+              <text class="chain-text">{{item.join(' → ')}}</text>
+            </view>
+          </view>
+          <view class="ui-note hint">以上为管理员已校对的先修关系（共 {{prereq.count}} 条）</view>
+        </block>
+        <view wx:else class="ui-note hint">先修关系须经管理员逐条校对后才展示，当前暂无已校对内容。</view>
+        <view class="link-btn" bindtap="togglePrereqImage">
+          {{showPrereqImage ? '收起' : '查看'}}官方先修关系原图
+        </view>
+        <image wx:if="{{showPrereqImage && prereqImage}}" class="prereq-img"
+               src="{{prereqImage}}" mode="widthFix" show-menu-by-longpress />
+      </view>
+
+      <!-- 毕业与授学位硬条件 -->
+      <view class="ui-card ui-card-pad">
+        <view class="ui-title">毕业与授学位硬条件</view>
+        <view class="req-list">
+          <view wx:for="{{overview.graduation_requirements}}" wx:key="item"
+                class="req-row" data-idx="{{index}}" bindtap="onReqCheck">
+            <view class="ui-check {{reqChecked[index] ? 'ui-check-on' : ''}}">
+              {{reqChecked[index] ? '✓' : ''}}
+            </view>
+            <view class="req-body">
+              <text class="req-type">[{{item.type}}]</text>
+              <text class="req-text">{{item.item}}：{{item.value}}{{item.unit}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="ui-note hint">勾选仅作个人自查，不会保存到学校系统</view>
+      </view>
+    </block>
+  </block>
+</view>

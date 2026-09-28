@@ -1,0 +1,74 @@
+/* pages/phone-whitelist/phone-whitelist.wxss —— 电话白名单管理（「学籍台账」视觉系统）
+   统计走 .ui-stats；格式说明走 .ui-fold；身份标签沿用 JS 下发的 chip-* 类名（改走令牌）。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 头部 ── */
+.head { display: flex; flex-direction: column; gap: 20rpx; }
+.btn-row { display: flex; gap: 16rpx; }
+.import-btn { font-size: var(--fs-meta); padding: 0 8rpx; }
+.import-btn[disabled] { color: var(--ink-3); background: var(--canvas); border-color: var(--line); }
+.add-btn { width: 100%; }
+.btn-row button, .add-btn { margin: 0; }
+.btn-row button::after, .add-btn::after { border: none; }
+
+/* ── Excel 格式说明 ── */
+.fold-open { transform: rotate(180deg); }
+.hint-body { display: flex; flex-direction: column; gap: 6rpx; }
+
+/* ── 列表头 ── */
+.list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.list-title { margin: 0; }
+
+/* ── 导入结果卡 ── */
+.result-stats { margin-top: 8rpx; }
+.sync-row { display: block; margin-top: 16rpx; }
+.import-errors {
+  max-height: 320rpx;
+  margin-top: 16rpx;
+  padding: 12rpx 20rpx;
+  background: var(--seal-soft);
+  border-radius: var(--r-md);
+  overflow-y: auto;
+}
+.err-row {
+  display: block;
+  font-size: var(--fs-micro);
+  color: var(--seal);
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+/* ── 身份标签（roleChip 由 JS 下发）── */
+.chip-student { background: var(--canvas); color: var(--ink-2); }
+.chip-teacher { background: var(--canvas); color: var(--ink); }
+.chip-admin { background: var(--amber-soft); color: var(--amber); }
+.chip-owner { background: var(--seal-soft); color: var(--seal); font-weight: 600; }
+
+/* ── 底部弹层 ── */
+.title-flat { margin-bottom: 0; }
+.ui-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.ui-sheet-head .ui-sheet-title { flex: 1; min-width: 0; }
+.ui-sheet-actions button { margin: 0; }
+.ui-sheet-actions button::after { border: none; }

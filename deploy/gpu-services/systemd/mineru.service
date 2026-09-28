@@ -1,0 +1,17 @@
+[Unit]
+Description=MinerU 2.5-Pro Document Parser
+After=network.target vllm.service
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=<DEPLOY_USER>
+Group=<DEPLOY_USER>
+ExecStart=/usr/local/bin/start-mineru.sh
+Restart=on-failure
+RestartSec=60
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

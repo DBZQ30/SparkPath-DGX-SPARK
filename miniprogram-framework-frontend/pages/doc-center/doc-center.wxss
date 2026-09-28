@@ -1,0 +1,33 @@
+/* pages/doc-center/doc-center.wxss —— 文件中心（012 · 「学籍台账」视觉系统） */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 上传卡 ── */
+.up-picker { width: 100%; margin-top: 16rpx; }
+.up-btn { margin-top: 16rpx; }
+.up-hint { display: block; margin-top: 16rpx; }
+
+/* ── 文件列表 ── */
+.file-item { align-items: flex-start; }
+.file-name { flex: 1; min-width: 0; }
+.file-acts { margin-top: 16rpx; flex-wrap: wrap; }
+
+/* ── 适用性弹层 ── */
+.sheet-label {
+  display: block;
+  margin: 24rpx 0 12rpx;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}

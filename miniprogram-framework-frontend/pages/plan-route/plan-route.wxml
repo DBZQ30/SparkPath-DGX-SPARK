@@ -1,0 +1,166 @@
+<!-- pages/plan-route/plan-route.wxml —— 多路径个性化学业规划（010） -->
+<view class="page">
+  <view wx:if="{{!enabled}}" class="ui-empty">{{stateText}}</view>
+
+  <block wx:else>
+    <!-- 选择区 -->
+    <view class="ui-pickers">
+      <picker class="ui-picker-wrap" mode="selector" range="{{majors}}" bindchange="onMajorChange">
+        <view class="ui-picker">
+          <text class="ui-picker-k">专业</text>
+          <text class="ui-picker-v">{{major || '请选择'}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+      <picker class="ui-picker-wrap" mode="selector" range="{{years}}" bindchange="onYearChange">
+        <view class="ui-picker">
+          <text class="ui-picker-k">年级</text>
+          <text class="ui-picker-v">{{entryYear || '请选择'}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 场景 -->
+    <view class="ui-seg">
+      <view class="ui-seg-item {{scene === 'route' ? 'ui-seg-on' : ''}}" data-scene="route" bindtap="onSceneTap">路线图</view>
+      <view class="ui-seg-item {{scene === 'select' ? 'ui-seg-on' : ''}}" data-scene="select" bindtap="onSceneTap">专业选择</view>
+      <view class="ui-seg-item {{scene === 'transfer' ? 'ui-seg-on' : ''}}" data-scene="transfer" bindtap="onSceneTap">转专业</view>
+    </view>
+
+    <view wx:if="{{errorText}}" class="ui-empty ui-note-danger">{{errorText}}</view>
+
+    <!-- ── 路线图 ── -->
+    <block wx:if="{{scene === 'route'}}">
+      <view class="ui-seg mode-seg">
+        <view wx:for="{{modes}}" wx:key="*this"
+              class="ui-seg-item {{mode === item ? 'ui-seg-on' : ''}}"
+              data-mode="{{item}}" bindtap="onModeTap">{{item}}</view>
+      </view>
+
+      <block wx:if="{{route}}">
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">路径规则</view>
+          <view wx:for="{{route.mode_overlay.rules}}" wx:key="index" class="rule-row">
+            <text class="rule-item">{{item.item}}</text>
+            <text class="rule-value">{{item.value}}{{item.unit}}</text>
+          </view>
+          <view wx:if="{{route.mode_overlay.scopes.length}}" class="ui-note">
+            跨选专业范围：{{route.mode_overlay.scopesText}}</view>
+          <view wx:if="{{route.mode_overlay.courses.length}}" class="ui-note">
+            模式课程清单（替代）：{{route.mode_overlay.coursesText}}</view>
+        </view>
+
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">四年时间轴</view>
+          <view wx:for="{{route.semesters}}" wx:key="semester" class="sem-block">
+            <view class="sem-head">
+              <text class="sem-name ui-num">{{item.semester}}</text>
+              <text class="sem-credit">{{item.credits}} 学分 · {{item.load_level}}</text>
+            </view>
+            <view class="load-bar">
+              <view class="load-fill load-{{item.loadClass}}" style="width: {{item.load_ratio * 100}}%"></view>
+            </view>
+            <view wx:for="{{item.courses}}" wx:for-item="c" wx:key="course_code" class="course-row">
+              <text class="course-name">{{c.course_name}}</text>
+              <text class="course-credit ui-num">{{c.credit}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">节奏节点</view>
+          <view wx:for="{{route.actions}}" wx:key="index" class="action-row">
+            <text class="action-tag {{item.source === '官方' ? 'tag-official' : 'tag-advice'}}">{{item.source === '官方' ? '官方' : '建议'}}</text>
+            <text class="action-text">大{{item.year}}｜{{item.stage_type}}：{{item.text}}</text>
+          </view>
+        </view>
+
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">压力提示</view>
+          <view class="ui-note">每学期上限 {{route.credit_limit}} 学分{{route.credit_limit_note ? '（' + route.credit_limit_note + '）' : ''}}</view>
+          <view class="ui-note">{{route.disclaimer}}</view>
+        </view>
+      </block>
+    </block>
+
+    <!-- ── 专业选择（分流） ── -->
+    <block wx:if="{{scene === 'select'}}">
+      <block wx:if="{{select}}">
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">{{select.entry_year}} 接收计划</view>
+          <view wx:for="{{select.plans}}" wx:key="major" class="rule-row">
+            <text class="rule-item">{{item.major}}</text>
+            <text class="rule-value">{{item.quota}} 人</text>
+          </view>
+        </view>
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">综合成绩构成</view>
+          <view class="ui-note">{{select.score_formula}}</view>
+          <view wx:if="{{select.academic_score}}" class="ui-note">
+            学业成绩估算：{{select.academic_score.estimated}}（{{select.academic_score.note}}）</view>
+        </view>
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">志愿策略参考（冲 / 稳 / 保）</view>
+          <view wx:for="{{select.strategy}}" wx:key="major" class="rule-row">
+            <text class="rule-item">{{item.tier}}：{{item.major}}</text>
+            <text class="rule-value">计划 {{item.quota}} 人</text>
+          </view>
+          <view class="ui-note">{{select.disclaimer}}</view>
+        </view>
+      </block>
+    </block>
+
+    <!-- ── 转专业模拟 ── -->
+    <block wx:if="{{scene === 'transfer'}}">
+      <view class="ui-pickers">
+        <picker class="ui-picker-wrap" mode="selector" range="{{majors}}" bindchange="onFromMajorChange">
+          <view class="ui-picker">
+            <text class="ui-picker-k">当前</text>
+            <text class="ui-picker-v">{{fromMajor || '请选择'}}</text>
+            <view class="ic ic-sm ic-chevdown"></view>
+          </view>
+        </picker>
+        <picker class="ui-picker-wrap" mode="selector" range="{{majors}}" bindchange="onToMajorChange">
+          <view class="ui-picker">
+            <text class="ui-picker-k">目标</text>
+            <text class="ui-picker-v">{{toMajor || '请选择'}}</text>
+            <view class="ic ic-sm ic-chevdown"></view>
+          </view>
+        </picker>
+      </view>
+
+      <block wx:if="{{transfer}}">
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">计划与资格</view>
+          <view wx:for="{{transfer.quota}}" wx:for-item="q" wx:for-index="scope" wx:key="scope" class="rule-row">
+            <text class="rule-item">{{scope}}</text>
+            <text class="rule-value">{{q}} 人</text>
+          </view>
+          <view class="ui-note">{{transfer.eligible ? '可报（有计划名额）' : '该年级/专业计划为 0，不可报'}}</view>
+          <view wx:if="{{transfer.downgrade}}" class="ui-note ui-note-warn">转入该专业须降级就读</view>
+        </view>
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">可抵扣 / 需补修</view>
+          <view class="ui-note">口径：{{transfer.source === 'student' ? '本人已修课程' : '方案级理论值（以实际修读为准）'}}</view>
+          <view class="ui-note">可抵扣 {{transfer.creditable.length}} 门 · 需补修 {{transfer.make_up_credits}} 学分{{transfer.failed.length ? ' · 已修挂科 ' + transfer.failed.length + ' 门' : ''}}</view>
+          <view wx:for="{{transfer.must_make_up}}" wx:key="course_name" class="course-row">
+            <text class="course-name">{{item.course_name}}</text>
+            <text class="course-credit ui-num">{{item.credit}}</text>
+          </view>
+        </view>
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">压力与红线</view>
+          <view class="ui-note">剩余 {{transfer.pressure.remaining_semesters}} 学期；到第三学年末剩 {{transfer.pressure.deadline_semesters}} 学期</view>
+          <view class="ui-note">需每学期约 {{transfer.pressure.avg_load}} 学分（上限 {{transfer.pressure.credit_limit}}，{{transfer.pressure.load_level}}）</view>
+          <view class="ui-note ui-note-warn">{{transfer.pressure.deadline_risk}}</view>
+        </view>
+        <view class="ui-card ui-card-pad">
+          <view class="ui-title">政策要点</view>
+          <view wx:for="{{transfer.rules}}" wx:key="index" class="ui-note">· {{item.item}}：{{item.value}}{{item.detail ? '（' + item.detail + '）' : ''}}</view>
+          <view class="ui-note">{{transfer.disclaimer}}</view>
+        </view>
+      </block>
+    </block>
+  </block>
+</view>

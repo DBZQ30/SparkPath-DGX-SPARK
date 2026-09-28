@@ -1,0 +1,63 @@
+/* pages/list/list.wxss —— 认证与身份（「学籍台账」视觉系统）
+   tab 改为常规流式 .ui-seg，去掉 fixed 与 magic number。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 卡片式列表项（主内容 + 操作纵向排列）── */
+.list-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+.item-value {
+  display: block;
+  margin-top: 6rpx;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+/* ── 审核操作（同意 / 拒绝 / 变更身份）── */
+.auth-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+.auth-actions .ui-pill { flex: 1; }
+.auth-actions button { margin: 0; }
+.auth-actions button::after { border: none; }
+
+/* ── 底部弹层 ── */
+.title-flat { margin-bottom: 0; }
+.ui-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.ui-sheet-head .ui-sheet-title { flex: 1; min-width: 0; }
+.ui-sheet-actions button { margin: 0; }
+.ui-sheet-actions button::after { border: none; }
+
+/* ── 身份单选 ── */
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  min-height: 88rpx;
+  font-size: var(--fs-body);
+  color: var(--ink);
+  border-bottom: 1rpx solid var(--line);
+}
+.radio-label:last-child { border-bottom: none; }

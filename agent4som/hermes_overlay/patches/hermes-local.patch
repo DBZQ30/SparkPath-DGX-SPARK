@@ -1,0 +1,174 @@
+diff --git a/gateway/platforms/base.py b/agent4som-hermesagent/hermes-agent/gateway/platforms/base.py
+index 6078ccf0..e88818a3 100644
+--- a/gateway/platforms/base.py
++++ b/gateway/platforms/base.py
+@@ -4985,6 +4985,10 @@ class BasePlatformAdapter(ABC):
+                 # metadata stays unmarked and progress bubbles remain
+                 # thread-strict.
+                 _final_thread_metadata = _mark_notify_metadata(_thread_metadata)
++                # 显式标记「最终答案」：HTTP 请求/响应型适配器（小程序）据此判定本轮
++                # 结束。运行途中的心跳「⏳ Working…」、工具前旁白、通知、审批提示等
++                # 状态消息都不带此标记，会被适配器忽略，不会提前结束请求。
++                _final_thread_metadata["hermes_final"] = True
+ 
+                 # Auto-TTS: if voice message, generate audio FIRST (before sending text)
+                 # Gated via ``_should_auto_tts_for_chat``: fires when the chat has
+diff --git a/gateway/run.py b/agent4som-hermesagent/hermes-agent/gateway/run.py
+index 992e5b19..5b230fb6 100644
+--- a/gateway/run.py
++++ b/gateway/run.py
+@@ -17199,8 +17199,25 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
+         long_tool_hint_fired = [False]
+         _LONG_TOOL_THRESHOLD_S = 30.0
+ 
++        # 执行轨迹旁路：只有显式声明 wants_agent_activity 的适配器才收这些事件
++        # （其余平台完全不受影响）。放在下面的进度队列门控之前，因此与
++        # 「工具展示开关」无关 —— 轨迹要的是事实，不是展示。
++        _activity_adapter = self._adapter_for_source(source)
++        if _activity_adapter is not None and not getattr(_activity_adapter, "wants_agent_activity", False):
++            _activity_adapter = None
++
+         def progress_callback(event_type: str, tool_name: str = None, preview: str = None, args: dict = None, **kwargs):
+             """Callback invoked by agent on tool lifecycle events."""
++            # 旁路通知（opt-in）：适配器可实现 on_agent_activity 收集执行轨迹。
++            # 必须早于下面的 log/progress 门控 —— 否则工具展示关闭时事件就丢了。
++            if _activity_adapter is not None:
++                try:
++                    _activity_adapter.on_agent_activity(
++                        event_type, tool_name=tool_name, preview=preview, args=args,
++                        chat_id=getattr(source, "chat_id", ""), **kwargs,
++                    )
++                except Exception:  # 展示层永不阻断 agent 循环
++                    logger.debug("agent-activity notify failed", exc_info=True)
+             # "log" mode: append tool.started lines to the log queue and stay
+             # silent in chat. Handled before the progress_queue guard because
+             # log mode runs without a chat progress queue.
+@@ -18301,8 +18318,28 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
+             # who set thinking_progress:true but kept tool_progress:off got a
+             # None callback — so _thinking scratch bubbles never relayed even
+             # though the progress queue was created for them.
++            # 执行轨迹：把模型推理增量转发给适配器（仅适配器 opt-in 时）。
++            # reasoning_callback 只接收一个「增量文本」位置参数，见
++            # run_agent._fire_reasoning_delta —— 这样「思考」拍是真正的流式思考链，
++            # 而不是回合结束才拼出的可见输出。
++            def _reasoning_activity_cb(_text: str) -> None:
++                if _activity_adapter is None:
++                    return
++                try:
++                    _activity_adapter.on_agent_activity(
++                        "thinking.delta", "_thinking", _text, None,
++                        chat_id=getattr(source, "chat_id", ""),
++                    )
++                except Exception:
++                    logger.debug("agent-thinking notify failed", exc_info=True)
++
++            agent.reasoning_callback = (
++                _reasoning_activity_cb if _activity_adapter is not None else None
++            )
+             agent.tool_progress_callback = (
+-                progress_callback if (needs_progress_queue or log_mode_enabled) else None
++                progress_callback
++                if (needs_progress_queue or log_mode_enabled or _activity_adapter is not None)
++                else None
+             )
+             # Discord voice verbal-ack hook (fires once per turn on first tool
+             # call; armed only when in a voice channel with the mixer running).
+@@ -18863,7 +18900,24 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
+                     _conversation_kwargs["moa_config"] = moa_config
+                 if _persist_user_timestamp_override is not None:
+                     _conversation_kwargs["persist_user_timestamp"] = _persist_user_timestamp_override
++                # 执行轨迹：run 前的 token 计数快照。agent 跨轮缓存复用，
++                # session_* 是累计值，取差值才是「本次 run」的用量。
++                _pre_prompt_toks = getattr(agent, "session_prompt_tokens", 0)
++                _pre_completion_toks = getattr(agent, "session_completion_tokens", 0)
++                _pre_reasoning_toks = getattr(agent, "session_reasoning_tokens", 0)
+                 result = agent.run_conversation(_api_run_message, **_conversation_kwargs)
++                if _activity_adapter is not None:
++                    try:
++                        _activity_adapter.on_agent_activity(
++                            "usage", "_usage", "", {
++                                "prompt_tokens": max(0, getattr(agent, "session_prompt_tokens", 0) - _pre_prompt_toks),
++                                "completion_tokens": max(0, getattr(agent, "session_completion_tokens", 0) - _pre_completion_toks),
++                                "reasoning_tokens": max(0, getattr(agent, "session_reasoning_tokens", 0) - _pre_reasoning_toks),
++                            },
++                            chat_id=getattr(source, "chat_id", ""),
++                        )
++                    except Exception:
++                        logger.debug("agent-usage notify failed", exc_info=True)
+             finally:
+                 unregister_gateway_notify(_approval_session_key)
+                 # Cancel any pending clarify entries so blocked agent
+diff --git a/tui_gateway/server.py b/agent4som-hermesagent/hermes-agent/tui_gateway/server.py
+index 8e825a22..f44b0a7d 100644
+--- a/tui_gateway/server.py
++++ b/tui_gateway/server.py
+@@ -3607,6 +3607,61 @@ def _on_tool_start(sid: str, tool_call_id: str, name: str, args: dict):
+         _emit("tool.start", sid, payload)
+ 
+ 
++def _maybe_emit_skill_activate(sid: str, name: str, args: dict, result: str) -> None:
++    """Emit ``skill.activate`` the first time a skill's SKILL.md is loaded.
++
++    Skills are activated by calling the ``skill_view`` tool (see
++    ``tools/skills_tool.py``).  Its result carries the resolved skill name and
++    the frontmatter description, so surface a dedicated event instead of
++    making every consumer special-case ``skill_view`` inside ``tool.complete``.
++
++    Fires once per skill per session.  Loading a linked file (``file_path``)
++    is a read, not an activation.  Best-effort by design: a malformed or
++    unsuccessful result must never break the tool call, so we only emit when
++    the payload says the load succeeded.
++    """
++    if name != "skill_view":
++        return
++    if (args or {}).get("file_path"):
++        return
++    if not _tool_progress_enabled(sid):
++        return
++
++    parsed = None
++    if isinstance(result, str):
++        try:
++            parsed = json.loads(result)
++        except Exception:
++            parsed = None
++
++    skill_name = ""
++    description = ""
++    if isinstance(parsed, dict):
++        if not parsed.get("success"):
++            return
++        skill_name = str(parsed.get("name") or "")
++        description = str(parsed.get("description") or "")
++    # Qualified/aliased calls may not echo a resolved name — fall back to what
++    # the model asked for so the event still names the skill.
++    skill_name = skill_name or str((args or {}).get("name") or "")
++    if not skill_name:
++        return
++
++    session = _sessions.get(sid)
++    seen = session.setdefault("activated_skills", set()) if session is not None else set()
++    if skill_name in seen:
++        return
++    seen.add(skill_name)
++
++    payload: dict[str, object] = {"name": skill_name, "source": "skill_view"}
++    if description:
++        payload["description"] = description
++    try:
++        _emit("skill.activate", sid, payload)
++    except Exception:
++        pass
++
++
+ def _on_tool_complete(sid: str, tool_call_id: str, name: str, args: dict, result: str):
+     payload = {"tool_id": tool_call_id, "name": name, "args": args}
+     session = _sessions.get(sid)
+@@ -3652,6 +3707,7 @@ def _on_tool_complete(sid: str, tool_call_id: str, name: str, args: dict, result
+         pass
+     if _tool_progress_enabled(sid) or payload.get("inline_diff"):
+         _emit("tool.complete", sid, payload)
++    _maybe_emit_skill_activate(sid, name, args, result)
+ 
+ 
+ def _on_tool_progress(

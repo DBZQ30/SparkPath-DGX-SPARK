@@ -1,0 +1,133 @@
+/* pages/user/user.wxss —— 我的页（「学籍台账」视觉系统） */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 身份卡 ── */
+.id-card {
+  margin: 24rpx 32rpx 0;
+  padding: 40rpx 24rpx 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--paper);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-md);
+}
+.avatar {
+  width: 132rpx;
+  height: 132rpx;
+  margin-bottom: 24rpx;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 56rpx;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Songti SC", "STSong", "Noto Serif CJK SC", "Noto Serif SC", serif;
+}
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 16rpx;
+}
+.name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+.edit-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.edit-btn:active { opacity: .6; }
+
+.content {
+  padding: 24rpx 32rpx 0;
+  box-sizing: border-box;
+}
+
+/* ── 登录 ── */
+.login-area { margin-top: 24rpx; }
+.login-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: var(--ink);
+  color: #fff;
+  font-size: var(--fs-body-lg);
+  font-weight: 600;
+  border-radius: 14rpx;
+  border: none;
+}
+.login-btn::after { border: none; }
+.login-btn[disabled] { opacity: .6; }
+
+/* ── 页脚 ── */
+.foot {
+  margin-top: 40rpx;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+}
+
+/* ── 修改用户名弹窗 ── */
+.modal-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(23, 50, 77, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-card {
+  width: 640rpx;
+  padding: 44rpx 40rpx;
+  background: var(--paper);
+  border-radius: var(--r-md);
+}
+.modal-title {
+  font-size: var(--fs-head);
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+.modal-input {
+  display: block;
+  width: 100%;
+  min-height: 88rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-sizing: border-box;
+  line-height: 44rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 12rpx;
+  font-size: var(--fs-body);
+  color: var(--ink);
+}
+.modal-btns {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 12rpx;
+}

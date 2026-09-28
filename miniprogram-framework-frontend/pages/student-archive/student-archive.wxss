@@ -1,0 +1,37 @@
+/* pages/student-archive/student-archive.wxss —— 学生档案管理（「学籍台账」视觉系统）
+   列表点行编辑；编辑用底部弹层 .ui-sheet*，字段用 .ui-field/.ui-input。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.head { display: flex; flex-direction: column; gap: 16rpx; }
+.title-flat { margin-bottom: 0; }
+
+/* ── 底部弹层 ── */
+.sheet-tall {
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+}
+.ui-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.ui-sheet-head .ui-sheet-title { flex: 1; min-width: 0; }
+.sheet-body { flex: 1; max-height: 56vh; margin-top: 8rpx; }
+
+/* ── 弹层按钮（button 重置）── */
+.ui-sheet-actions button { margin: 0; }
+.ui-sheet-actions button::after { border: none; }

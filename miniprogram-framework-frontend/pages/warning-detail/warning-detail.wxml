@@ -1,0 +1,242 @@
+<!-- pages/warning-detail/warning-detail.wxml —— 学生预警详情页（2026-09-06）
+     入口：学业预警名单行"详情" wx.navigateTo（原生导航栏返回 = 回到学业预警列表页）。
+     全量预警信息：学生头部卡 + 触发概况 chips + 类别差额逐类（含缺修下钻）+ 其他未修/
+     挂科 + 未及格科目 + 本学期选课 + 已修课程（分组折叠/未匹配可认可）+ 该生豁免记录
+     + 三个底部弹层（平替 / 学分认可 / 免修确认）。 -->
+<view class="page">
+  <!-- 加载态 -->
+  <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载详情…</view>
+  <!-- 空态（名单外/无检查数据） -->
+  <view wx:elif="{{emptyTip}}" class="ui-empty">{{emptyTip}}</view>
+
+  <block wx:else>
+    <!-- ── 学生头部卡（内容，非重复页面名）── -->
+    <view class="ui-card ui-card-pad stu-card">
+      <view class="stu-line">
+        <text class="stu-name">{{stu.name || ''}}</text>
+        <text class="stu-id">{{stu.student_id}}</text>
+      </view>
+      <text class="stu-meta">{{stu.major || '未知专业'}} {{stu.class_name || ''}} · {{grade}}</text>
+      <!-- 触发概况：全部预警门类（非仅最差一类） -->
+      <view wx:if="{{chips.length}}" class="chip-row">
+        <text wx:for="{{chips}}" wx:key="text" class="ui-tag {{item.cls}}">{{item.text}}</text>
+      </view>
+    </view>
+
+    <!-- 兜底 message（老批次无结构化 details） -->
+    <view wx:if="{{rowMsg}}" class="ui-banner ui-banner-warn msg-card">
+      <text class="msg-text">{{rowMsg}}</text>
+    </view>
+
+    <!-- ── 段1：类别差额（缺修课按类别归拢下钻）── -->
+    <view wx:if="{{cats.length}}" class="ui-card sec-card">
+      <view class="sec-head">
+        <text class="sec-title">类别差额（{{cats.length}} 类）</text>
+        <text class="sec-note">差额 = 应修 − 已修 − 已选（>0 即触发）</text>
+      </view>
+      <view wx:for="{{cats}}" wx:key="cat" class="cat-row">
+        <view class="cat-line">
+          <text class="cat-name">{{item.cat}}</text>
+          <text wx:if="{{item.extra > 0}}" class="ui-tag ui-tag-ok cat-tip">含认可 {{item.extraStr}} 学分</text>
+        </view>
+        <text class="cat-nums">应修 {{item.expected}} · 已修 {{item.gained}} · 已选 {{item.selected}} · 差 {{item.gap}}</text>
+        <!-- 该类缺修课下钻（免修/平替入口） -->
+        <view wx:if="{{item.missing.length}}" class="cat-miss">
+          <text class="cat-miss-head">缺修（{{item.missing.length}} 门）</text>
+          <view wx:for="{{item.missing}}" wx:for-item="m" wx:for-index="mi" wx:key="_k" class="d-row d-row-sub">
+            <view class="d-main">
+              <text class="d-name">{{m.name}}<text wx:if="{{m.credit}}" class="d-credit">（{{m.credit}} 学分）</text><text wx:if="{{m.failTip}}" class="d-reason-failed">{{m.failTip}}</text></text>
+              <text class="d-code">{{m.code}}</text>
+            </view>
+            <text wx:if="{{m.waived}}" class="ui-tag ui-tag-muted d-waived">已豁免（下次 run 生效）</text>
+            <view wx:else class="d-ops">
+              <view wx:if="{{!m.failed}}" class="ui-pill" data-cat-index="{{index}}" data-index="{{mi}}" data-mode="replace" bindtap="waiveCourse">平替</view>
+              <view class="ui-pill ui-pill-warn" data-cat-index="{{index}}" data-index="{{mi}}" data-mode="exempt" bindtap="waiveCourse">免修</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 段1b：其他未修/挂科必修课（类别学分已达标，但仍未通过，需重修）── -->
+    <view wx:if="{{otherMissing.length}}" class="ui-card sec-card">
+      <view class="sec-head">
+        <text class="sec-title">其他未修/挂科必修课（{{otherMissing.length}}）</text>
+        <text class="sec-note">所在类别学分已达标，但以下必修课仍未通过，需重修</text>
+      </view>
+      <view wx:for="{{otherMissing}}" wx:key="_k" class="d-row">
+        <view class="d-main">
+          <text class="d-name">{{item.name}}<text wx:if="{{item.credit}}" class="d-credit">（{{item.credit}} 学分）</text><text wx:if="{{item.failTip}}" class="d-reason-failed">{{item.failTip}}</text></text>
+          <text wx:if="{{item.cat}}" class="d-code">{{item.cat}} · {{item.code}}</text>
+          <text wx:else class="d-code">{{item.code}}</text>
+        </view>
+        <text wx:if="{{item.waived}}" class="ui-tag ui-tag-muted d-waived">已豁免（下次 run 生效）</text>
+        <view wx:else class="d-ops">
+          <view wx:if="{{!item.failed}}" class="ui-pill" data-other-index="{{index}}" data-index="{{index}}" data-mode="replace" bindtap="waiveCourse">平替</view>
+          <view class="ui-pill ui-pill-warn" data-other-index="{{index}}" data-index="{{index}}" data-mode="exempt" bindtap="waiveCourse">免修</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 段2：未及格科目（代表行不及格每课一条；命中方案必修 → 已报缺修）── -->
+    <view wx:if="{{failed.length}}" class="ui-card sec-card">
+      <view class="sec-head">
+        <text class="sec-title">未及格科目（{{failed.length}}）</text>
+        <text class="sec-note">同课重修补考取最高分记录，仍不及格则在此列出</text>
+      </view>
+      <view wx:for="{{failed}}" wx:key="_k" class="d-row">
+        <view class="d-main">
+          <text class="d-name">{{item.name}}<text wx:if="{{item.credit}}" class="d-credit">（{{item.credit}} 学分）</text></text>
+          <text class="d-meta">{{item.meta}}</text>
+        </view>
+        <view class="d-ops">
+          <text wx:if="{{item.waived}}" class="ui-tag ui-tag-muted d-waived">已豁免（下次 run 生效）</text>
+          <view wx:else class="ui-pill ui-pill-warn" data-index="{{index}}" bindtap="waiveFailed">免修</view>
+        </view>
+        <text wx:if="{{item.reported_missing}}" class="ui-tag ui-tag-warn d-miss-chip">已报缺修</text>
+      </view>
+    </view>
+
+    <!-- ── 本学期选课（当前选课结果文件中的选中课程）── -->
+    <view wx:if="{{selections.length}}" class="ui-card sec-card">
+      <view class="sec-head">
+        <text class="sec-title">本学期选课（{{selections.length}}）</text>
+        <text class="sec-note">当前选课结果文件中的选中课程</text>
+      </view>
+      <view wx:for="{{selections}}" wx:key="_k" class="d-row">
+        <view class="d-main">
+          <text class="d-name">{{item.name}}</text>
+          <text class="d-meta">{{item.meta}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── 段4：已修课程（匹配分组折叠 / 未匹配候选可平替、认可）── -->
+    <view class="ui-card sec-card">
+      <view class="sec-head sec-fold" bindtap="toggleCourses">
+        <text class="sec-title">已修课程（匹配 {{matchedCount}} · 未匹配 {{reasonUnmatched.length}}）</text>
+        <text class="ui-fold-arrow fold-arrow">{{coursesOpen ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+      <block wx:if="{{coursesOpen}}">
+        <view wx:if="{{!matchedCount && !reasonUnmatched.length}}" class="sec-empty">该生暂无已修课程记录</view>
+        <block wx:for="{{reasonMatched}}" wx:key="cat" wx:for-item="grp" wx:for-index="gi">
+          <view class="grp-head" data-index="{{gi}}" bindtap="toggleGrp">
+            <text class="grp-cat">{{grp.cat}}</text>
+            <text class="grp-count">{{grp.items.length}} 门</text>
+            <text class="grp-arrow">{{grp.open ? '▲ 收起' : '▼ 展开'}}</text>
+          </view>
+          <block wx:if="{{grp.open}}">
+            <view wx:for="{{grp.items}}" wx:for-item="c" wx:key="_k" class="c-row">
+              <text class="c-name">{{c.name}}</text>
+              <text class="c-meta">{{c.meta}}</text>
+              <text wx:if="{{c.fail}}" class="ui-tag ui-tag-danger c-fail">未及格</text>
+            </view>
+          </block>
+        </block>
+        <view class="um-head">
+          <text class="sec-title um-title">未匹配课（可平替 / 学分认可）</text>
+          <text class="sec-note">可能为旧版课程；已用于平替/认可的课不在此列</text>
+        </view>
+        <view wx:if="{{!reasonUnmatched.length}}" class="sec-empty">无可用未匹配旧课（仅可免修）</view>
+        <view wx:for="{{reasonUnmatched}}" wx:key="_k" class="d-row">
+          <view class="d-main">
+            <text class="d-name">{{item.course_name}}</text>
+            <view wx:if="{{item.meta || item.fail}}" class="d-mline">
+              <text class="d-meta">{{item.meta}}</text>
+              <text wx:if="{{item.fail}}" class="d-fail">未及格</text>
+            </view>
+          </view>
+          <view class="d-ops">
+            <view class="ui-pill ui-pill-ok {{item.usable ? '' : 'd-op-disabled'}}" data-index="{{index}}" bindtap="waiveCredit">认可学分</view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- ── 段5：该生豁免记录（撤销入口）── -->
+    <view class="ui-card sec-card">
+      <view class="sec-head">
+        <text class="sec-title">豁免记录（{{waivers.length}}）</text>
+        <text class="sec-note">豁免/认可以下次运行选课检查生效</text>
+      </view>
+      <view wx:if="{{!waivers.length}}" class="sec-empty">该生暂无豁免/认可记录</view>
+      <view wx:for="{{waivers}}" wx:key="id" class="waiver-row">
+        <view class="ui-item-main">
+          <text class="waiver-label">{{item.label}}</text>
+          <text wx:if="{{item.sub}}" class="ui-item-sub">{{item.sub}}</text>
+        </view>
+        <view class="ui-pill ui-pill-danger" data-id="{{item.id}}" bindtap="waiverDelete">撤销</view>
+      </view>
+    </view>
+
+    <view class="page-end"></view>
+
+    <!-- 平替选择（Bottom Sheet：候选 = 该生未匹配课） -->
+    <view wx:if="{{pickState.op === 'replace'}}" class="ui-sheet-mask" bindtap="closePick"
+          catchtouchmove="noop" style="padding-bottom: {{kbdH}}px">
+      <view class="ui-sheet pick-sheet-list" catchtap="noop">
+        <view class="pick-head">
+          <text class="ui-sheet-title pick-title">平替《{{pickState.name || pickState.code}}》</text>
+          <view class="ui-sheet-close" bindtap="closePick"><view class="ic ic-sm ic-close"></view></view>
+        </view>
+        <text class="ui-note pick-sub">选择该生已修旧课作为平替来源：方案课豁免并视为已修，下次运行选课检查时生效。</text>
+        <scroll-view scroll-y class="pick-list">
+          <view wx:if="{{!reasonUnmatched.length}}" class="sec-empty">无可用未匹配旧课，可选免修</view>
+          <view wx:for="{{reasonUnmatched}}" wx:key="_k" class="pick-row {{item.usable ? '' : 'pick-row-disabled'}}"
+                data-index="{{index}}" bindtap="chooseReplace">
+            <text class="pick-course">{{item.course_name}}</text>
+            <text class="pick-meta">{{item.meta}}</text>
+          </view>
+          <view class="sheet-end"></view>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- 学分认可（Bottom Sheet：类别 picker + 备注；键盘弹出自动抬升） -->
+    <view wx:if="{{pickState.op === 'credit'}}" class="ui-sheet-mask" bindtap="closePick"
+          catchtouchmove="noop" style="padding-bottom: {{kbdH}}px">
+      <view class="ui-sheet pick-sheet-form" catchtap="noop">
+        <view class="pick-head">
+          <text class="ui-sheet-title pick-title">认可学分《{{pickState.course.course_name}}》</text>
+          <view class="ui-sheet-close" bindtap="closePick"><view class="ic ic-sm ic-close"></view></view>
+        </view>
+        <text class="ui-note pick-sub">{{pickState.course.meta}} —— 认可后学分计入所选类别（下次运行选课检查时生效），成绩单记录保留。</text>
+        <view class="credit-cat">
+          <text class="credit-cat-label">计入类别</text>
+          <picker mode="selector" range="{{creditCats}}" value="{{pickCatIdx}}" bindchange="onPickCat">
+            <view class="ui-pill row-pill">
+              <text>{{creditCats[pickCatIdx]}}</text>
+              <view class="ic ic-sm ic-chevdown"></view>
+            </view>
+          </picker>
+        </view>
+        <input class="ui-input pick-note" value="{{pickNote}}" bindinput="onPickNote"
+               bindkeyboardheightchange="onKbd" bindblur="onKbdHide"
+               placeholder="备注（选填，如：旧版选修课程替换说明）" />
+        <view class="ui-btn ui-btn-primary pick-submit" bindtap="confirmCredit">确认认可</view>
+      </view>
+    </view>
+
+    <!-- 免修确认面板（大字号可读文本 + 备注 + 取消/确认） -->
+    <view wx:if="{{exemptState}}" class="ui-sheet-mask" bindtap="closeExempt"
+          catchtouchmove="noop" style="padding-bottom: {{kbdH}}px">
+      <view class="ui-sheet pick-sheet-form" catchtap="noop">
+        <view class="pick-head">
+          <text class="ui-sheet-title pick-title">免修确认《{{exemptState.name}}》</text>
+          <view class="ui-sheet-close" bindtap="closeExempt"><view class="ic ic-sm ic-close"></view></view>
+        </view>
+        <scroll-view scroll-y class="exempt-scroll">
+          <text class="exempt-tip">{{exemptState.tip}}</text>
+        </scroll-view>
+        <text class="ui-field-label exempt-note-label">处理依据（备注，将随豁免记录存档）</text>
+        <input class="ui-input pick-note" value="{{exemptNote}}" bindinput="onExemptNote"
+               bindkeyboardheightchange="onKbd" bindblur="onKbdHide"
+               placeholder="{{exemptState.placeholder}}" />
+        <view class="ui-sheet-actions">
+          <view class="ui-btn ui-btn-ghost" bindtap="closeExempt">取消</view>
+          <view class="ui-btn ui-btn-primary" bindtap="confirmExempt">确认免修</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

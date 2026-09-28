@@ -1,0 +1,60 @@
+/* pages/knowledge/knowledge.wxss —— 知识库管理（「学籍台账」视觉系统）
+   破坏性操作走 .ui-pill-danger；勾选框统一 .ui-check（热区 ≥64rpx）。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 头部 ── */
+.head { display: flex; flex-direction: column; gap: 8rpx; }
+.head-sub { flex: 1; min-width: 0; }
+.head-link { flex-shrink: 0; height: 64rpx; line-height: 64rpx; padding-left: 16rpx; }
+
+/* ── 列表头 ── */
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.list-title { margin: 0; }
+.head-ops { display: flex; align-items: center; gap: 16rpx; }
+
+/* ── 来源筛选 ── */
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.filter-chips { flex: 1; min-width: 0; }
+
+/* ── 排序 ── */
+.sort-row { display: flex; align-items: center; gap: 16rpx; }
+.sort-label { flex-shrink: 0; }
+
+/* ── 勾选热区（视觉 44rpx，触控 64rpx）── */
+.check-hit {
+  flex-shrink: 0;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 行内文本 ── */
+.name-hit { min-height: 64rpx; display: flex; align-items: center; }
+.item-hint { display: block; margin-top: 6rpx; }
+.title-flat { margin-bottom: 0; }
+.err-row { display: block; margin-top: 8rpx; word-break: break-all; }

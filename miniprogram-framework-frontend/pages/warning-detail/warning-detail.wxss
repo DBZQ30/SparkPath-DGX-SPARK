@@ -1,0 +1,127 @@
+/* pages/warning-detail/warning-detail.wxss —— 学生预警详情页（「学籍台账」视觉系统）
+   信息密度最高：统一 ui-card 分组 / ui-item / ui-pill-* 操作 / ui-tag-* 状态；
+   行内操作全部 ≥64rpx。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 学生头部卡（内容）+ 触发概况 chips ── */
+.stu-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12rpx; }
+.stu-name { font-size: var(--fs-head); font-weight: 600; color: var(--ink); word-break: break-all; }
+.stu-id { font-size: var(--fs-meta); color: var(--ink-3); }
+.stu-meta { display: block; margin-top: 6rpx; font-size: var(--fs-meta); color: var(--ink-3); }
+.chip-row { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 20rpx; }
+.chip-gap { background: var(--seal-soft); color: var(--seal); font-weight: 600; }
+.chip-alert { background: var(--amber-soft); color: var(--amber); font-weight: 600; }
+
+/* 兜底 message 卡 */
+.msg-text { font-size: var(--fs-body); color: var(--ink-2); line-height: 1.7; word-break: break-all; }
+
+/* ── 分区卡 ── */
+.sec-card { padding: 8rpx 28rpx 16rpx; }
+.sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  padding: 20rpx 0 4rpx;
+}
+.sec-title { font-size: var(--fs-body); font-weight: 600; color: var(--ink); }
+.sec-note { font-size: var(--fs-micro); color: var(--ink-3); }
+.sec-empty { font-size: var(--fs-meta); color: var(--ink-3); padding: 24rpx 4rpx; }
+.fold-arrow { margin-left: auto; padding-left: 24rpx; }
+
+/* ── 行：主信息收缩换行 + 操作区右缘钉住 ── */
+.d-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx 4rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.d-row:last-child { border-bottom: none; }
+.d-main { flex: 1; min-width: 0; }
+.d-name { font-size: var(--fs-body); font-weight: 500; color: var(--ink); line-height: 1.5; word-break: break-all; }
+.d-credit { font-size: var(--fs-micro); font-weight: 400; color: var(--ink-3); }
+.d-reason-failed { font-size: var(--fs-micro); font-weight: 400; color: var(--seal); }
+.d-code, .d-meta {
+  display: block;
+  margin-top: 4rpx;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+  word-break: break-all;
+  line-height: 1.5;
+}
+.d-mline { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 12rpx; margin-top: 4rpx; }
+.d-mline .d-meta { display: inline; margin-top: 0; }
+.d-fail { flex-shrink: 0; font-size: var(--fs-micro); color: var(--seal); font-weight: 600; }
+
+.d-ops { flex-shrink: 0; display: flex; align-items: center; gap: 16rpx; margin-left: 24rpx; padding-top: 4rpx; }
+.d-waived { flex-shrink: 0; }
+.d-row > .d-waived { margin-left: 24rpx; }
+.d-miss-chip { flex-shrink: 0; margin-left: 24rpx; }
+.d-op-disabled { color: var(--ink-3); background: var(--paper); border-color: var(--line); }
+
+/* ── 类别差额 ── */
+.cat-row { padding: 16rpx 4rpx; border-bottom: 1rpx solid var(--line); }
+.cat-row:last-child { border-bottom: none; }
+.cat-line { display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx; }
+.cat-name { font-size: var(--fs-body); font-weight: 600; color: var(--ink); }
+.cat-nums { display: block; margin-top: 6rpx; font-size: var(--fs-meta); color: var(--ink-2); }
+.cat-miss { margin-top: 12rpx; padding-left: 20rpx; border-left: 4rpx solid var(--amber); }
+.cat-miss-head { display: block; padding: 4rpx 0; font-size: var(--fs-micro); font-weight: 600; color: var(--amber); }
+.d-row-sub { padding: 16rpx 0; }
+
+/* ── 已修课程分组折叠 ── */
+.grp-head { display: flex; align-items: center; padding: 20rpx 4rpx 8rpx; }
+.grp-cat { min-width: 0; word-break: break-all; font-size: var(--fs-meta); font-weight: 600; color: var(--ink-2); }
+.grp-count { flex: 1; min-width: 0; margin-left: 12rpx; font-size: var(--fs-micro); color: var(--ink-3); }
+.grp-arrow { flex-shrink: 0; white-space: nowrap; font-size: var(--fs-micro); color: var(--ink-2); }
+.c-row { display: flex; flex-wrap: wrap; align-items: baseline; padding: 10rpx 4rpx 10rpx 8rpx; font-size: var(--fs-meta); color: var(--ink-2); }
+.c-name { margin-right: 12rpx; word-break: break-all; }
+.c-meta { font-size: var(--fs-micro); color: var(--ink-3); }
+.c-fail { flex-shrink: 0; margin-left: 12rpx; }
+.um-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8rpx; margin-top: 16rpx; padding: 12rpx 4rpx 0; }
+.um-title { color: var(--amber); }
+
+/* ── 豁免记录 ── */
+.waiver-row { display: flex; align-items: center; padding: 20rpx 4rpx; border-bottom: 1rpx solid var(--line); }
+.waiver-row:last-child { border-bottom: none; }
+.waiver-label { display: block; font-size: var(--fs-meta); font-weight: 500; color: var(--ink-2); word-break: break-all; }
+
+.page-end { height: 8rpx; }
+
+/* ── 底部弹层（平替 / 认可 / 免修）── */
+.pick-sheet-list { height: 70vh; display: flex; flex-direction: column; }
+.pick-head { display: flex; align-items: center; gap: 16rpx; }
+.pick-title { flex: 1; min-width: 0; margin-bottom: 0; }
+.pick-sub { display: block; margin: 12rpx 0 4rpx; }
+.pick-list { flex: 1; min-height: 0; }
+.pick-row { display: flex; flex-direction: column; padding: 24rpx 4rpx; border-bottom: 1rpx solid var(--line); }
+.pick-row:last-child { border-bottom: none; }
+.pick-course { font-size: var(--fs-body); color: var(--ink); word-break: break-all; line-height: 1.5; }
+.pick-meta { margin-top: 4rpx; font-size: var(--fs-micro); color: var(--ink-3); word-break: break-all; }
+.pick-row-disabled .pick-course,
+.pick-row-disabled .pick-meta { color: var(--ink-3); }
+.sheet-end { height: calc(44rpx + env(safe-area-inset-bottom)); flex-shrink: 0; }
+
+.row-pill { display: flex; align-items: center; gap: 8rpx; }
+.credit-cat { display: flex; align-items: center; gap: 20rpx; margin-top: 8rpx; font-size: var(--fs-meta); color: var(--ink-2); }
+.credit-cat-label { flex-shrink: 0; }
+.pick-note { margin-top: 24rpx; }
+.pick-submit { margin-top: 24rpx; }
+
+.exempt-scroll { max-height: 34vh; margin-top: 8rpx; }
+.exempt-tip { display: block; padding: 8rpx 4rpx; font-size: var(--fs-body); color: var(--ink-2); line-height: 1.8; word-break: break-all; }
+.exempt-note-label { display: block; margin-top: 20rpx; }

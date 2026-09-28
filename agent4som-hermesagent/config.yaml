@@ -1,0 +1,149 @@
+model:
+  # 主对话模型：本地 vLLM（:8000）qwen3.8-27b —— 默认全本地推理，问答/检索内容不出校。
+  # 可选：切换为云端 StepFun Step Plan（provider: stepfun、default: step-5-preview），
+  #       需配置 STEPFUN_API_KEY / STEPFUN_BASE_URL=https://api.stepfun.com/step_plan/v1。
+  default: qwen3.8-27b
+  provider: local
+  # 本地 vLLM(:8000) 实际 max-model-len = 262144；这里取 131072：
+  # ① Hermes 硬性要求 ≥ 64000；② 压缩阈值 = 0.5×context_length ≈ 65K，
+  # 在 GB10 本地推理(~10 tok/s)下避免超长 prompt 拖慢首包。
+  context_length: 131072
+  supports_vision: true
+custom_providers:
+- name: local
+  base_url: http://127.0.0.1:8000/v1
+  api_key: sk-local
+  model: qwen3.8-27b
+terminal:
+  backend: local
+  cwd: ~/SparkPath-DGX-SPARK/agent4som
+agent:
+  max_turns: 50
+  verbose: false
+  reasoning_effort: medium
+  gateway_timeout: 1800
+  restart_drain_timeout: 60
+knowledge_base:
+  chroma_path: ~/SparkPath-DGX-SPARK/agent4som/data/chroma/
+skills:
+  creation_nudge_interval: 15
+  external_dirs:
+  - ~/SparkPath-DGX-SPARK/agent4som/shared_skills
+platform_toolsets:
+  cli:
+  - hermes-cli
+  miniapp:
+  - web
+  - terminal
+  - file
+  - skills
+  - todo
+  - rag
+role_toolsets:
+  admin:
+  - web
+  - file
+  - skills
+  - todo
+  - rag
+  teacher:
+  - file
+  - skills
+  - todo
+  - rag
+  - vision
+  student:
+  - file
+  - skills
+  - todo
+  - rag
+  guest:
+  - rag
+  - skills
+gateway:
+  platform: miniapp
+  streaming:
+    enabled: true
+platforms:
+  miniapp:
+    enabled: true
+    extra:
+      host: "127.0.0.1"
+      port: "8010"
+      # 单次 agent run 常见 60–165s（重问题可到 300s 级）；与前端 wx.request、
+      # nginx proxy_read_timeout 保持一致，避免 120s 处假超时丢答案。
+      response_timeout_seconds: 300
+      sqlite_path: "~/SparkPath-DGX-SPARK/agent4som/data/sqlite/miniapp.db"
+      allowed_origins: "https://isom.xjtu.edu.cn"
+streaming:
+  enabled: true
+display:
+  compact: true
+  personality: helpful
+  streaming: true
+  show_reasoning: false
+  # 关闭「工具调用前旁白」（interim）：它会经 _status_adapter.send 当普通消息发出，
+  # 而小程序适配器是「第一条 send 即 resolve /api/chat 的 future」——旁白会抢先
+  # 填掉 future，前端就拿到旁白而不是最终答案（实测出现英文 "I'll check the data..."）。
+  interim_assistant_messages: false
+sessions:
+  auto_prune: false
+  retention_days: 90
+  vacuum_after_prune: true
+  min_interval_hours: 24
+logging:
+  level: INFO
+  max_size_mb: 5
+  backup_count: 3
+security:
+  redact_secrets: true
+privacy:
+  redact_pii: true
+compression:
+  enabled: true
+  threshold: 0.5
+  target_ratio: 0.2
+  protect_last_n: 20
+auxiliary:
+  compression:
+    # 显式声明压缩摘要模型的 context_length，跳过 models.dev 查询（该域名
+    # 当前环境不可达，会白等 15s 超时）。与 model.context_length 一致。
+    context_length: 131072
+    # 辅助任务（压缩摘要 / 视觉）统一走本地 :8000，避免外网与额度问题
+    provider: custom
+    base_url: http://127.0.0.1:8000/v1
+    api_key: sk-local
+    model: qwen3.8-27b
+  vision:
+    provider: custom
+    base_url: http://127.0.0.1:8000/v1
+    api_key: sk-local
+    model: qwen3.8-27b
+tool_output:
+  max_bytes: 50000
+  max_lines: 2000
+  max_line_length: 2000
+checkpoints:
+  enabled: true
+  max_snapshots: 50
+  retention_days: 7
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  memory_char_limit: 2200
+  user_char_limit: 1375
+context:
+  engine: compressor
+prompt_caching:
+  cache_ttl: 5m
+hooks: {}
+plugins:
+  enabled:
+  - miniapp-platform
+_config_version: 22
+onboarding:
+  seen:
+    busy_input_prompt: true
+    profile_build_offered: true
+approvals:
+  destructive_slash_confirm: false

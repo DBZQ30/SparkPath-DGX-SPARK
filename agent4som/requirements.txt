@@ -1,0 +1,22 @@
+# SOM platform — knowledge_base repository dependencies
+# ChromaDB for vector storage (HTTP service mode, always via chroma-server)
+chromadb==1.5.9
+# Pydantic for data models
+pydantic>=2.0
+requests>=2.32
+# miniapp-proxy 上游转发
+httpx
+# Document parsing
+llama-index-core>=0.14
+pdfminer.six
+openpyxl
+python-docx
+python-pptx
+pypdf
+# 学业预警：课表/学籍异动 xls 解析（xlrd）、成绩单学号图片 OCR（Pillow）
+xlrd
+Pillow
+# 学业预警 HTTP API（小程序入口）：FastAPI 上传端点（python-multipart 为 File() 必需）
+fastapi
+uvicorn
+python-multipart

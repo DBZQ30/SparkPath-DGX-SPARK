@@ -1,0 +1,20 @@
+[Unit]
+Description=Qwen3 Reranker Server (CPU)
+After=network.target
+
+[Service]
+Type=simple
+User=<DEPLOY_USER>
+Group=<DEPLOY_USER>
+Environment=CUDA_VISIBLE_DEVICES=
+# 监听地址占位符：生产替换为 GPU 主机地址（如 GPU_HOST 对应 IP）
+Environment=HOST=<GPU_HOST_IP>
+# API_KEY 由 /etc/sparkpath/gpu-services.env 提供（见 gpu-services.env.example）
+EnvironmentFile=-/etc/sparkpath/gpu-services.env
+Environment=PORT=8002
+ExecStart=/home/miniconda3/envs/ai/bin/python3.11 /usr/local/bin/reranker_server.py
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

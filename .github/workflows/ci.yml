@@ -1,0 +1,83 @@
+name: CI
+
+# 质量门：lint（阻断）+ 离线测试子集（阻断，不依赖 Hermes）+ 依赖 CVE 扫描（advisory）
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent4som
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install ruff
+      - name: ruff check
+        run: ruff check .
+      - name: radon complexity gate (no D/E/F)
+        run: |
+          pip install radon
+          out=$(python -m radon cc . -n D -s)
+          if [ -n "$out" ]; then echo "$out"; exit 1; fi
+
+  tests-core:
+    name: Offline tests (blocking; Hermes-independent)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          pip install -r agent4som/requirements.txt
+          pip install -r agent4som/requirements-dev.txt
+      - name: pytest (Hermes-independent subset)
+        working-directory: agent4som
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/knowledge_base/auth/test_gateway_role_resolution.py \
+            --ignore=tests/knowledge_base/auth/test_permission_intersection.py \
+            --ignore=tests/repro \
+            -m "not integration and not network and not samples" -q
+
+  tests-full:
+    name: Offline tests (advisory; needs Hermes framework)
+    runs-on: ubuntu-latest
+    # 离线套件的少部分用例依赖 ~/.hermes/hermes-agent（上游框架）；CI 不安装该框架，
+    # 因此整轮设为 advisory，仅做信号参考。核心子集见 tests-core。
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          pip install -r agent4som/requirements.txt
+          pip install -r agent4som/requirements-dev.txt
+      - name: pytest (all offline)
+        working-directory: agent4som
+        run: python -m pytest tests/ -m "not integration and not network and not samples" -q
+
+  cve:
+    name: Dependency CVE (pip-audit, advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r agent4som/requirements.txt || true

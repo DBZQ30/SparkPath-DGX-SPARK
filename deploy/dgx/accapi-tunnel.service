@@ -1,0 +1,32 @@
+[Unit]
+Description=Reverse SSH tunnels to acc-svr (18000->dgx:8020, 8010->dgx:8010, 18008->dgx:8008, 18009->dgx:8009)
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/dgx/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 四条反向隧道：
+#   18000 -> dgx:8020  给 /accapi/ 全量切换用（nginx -> 18000 -> miniapp-proxy -> 8010）
+#   8010  -> dgx:8010  给 /accapi/dgx-agentapi 直连路由用
+#   18008 -> dgx:8008  给 /accapi/dgx-warning 路由用（学业预警 API）
+#   18009 -> dgx:8009  给 /accapi/dgx-plan 路由用（培养方案解读 API，004 设计）
+#   dgx 上 :8000 被 vLLM Qwen3.8-27B 占用，故 miniapp-proxy 用 8020
+ExecStart=/usr/bin/autossh -M 0 -N \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=3 \
+  -o ExitOnForwardFailure=yes \
+  -o BatchMode=yes \
+  -o StrictHostKeyChecking=accept-new \
+  -o TCPKeepAlive=yes \
+  -R 127.0.0.1:18000:127.0.0.1:8020 \
+  -R 127.0.0.1:8010:127.0.0.1:8010 \
+  -R 127.0.0.1:18008:127.0.0.1:8008 \
+  -R 127.0.0.1:18009:127.0.0.1:8009 \
+  root@<ACC_SVR_IP>
+Restart=always
+RestartSec=10
+Environment=AUTOSSH_GATETIME=0
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,2 @@
+# 统一 LF 行尾，避免 Windows autocrlf 把无末尾换行的 JSON 误报为已修改
+* text=auto eol=lf

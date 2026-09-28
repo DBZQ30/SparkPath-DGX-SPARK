@@ -1,0 +1,75 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="ui-loading"><view class="ui-spinner"></view>加载中…</view>
+
+  <block wx:else>
+    <!-- 手机号（身份匹配依据） -->
+    <view class="ui-card ui-card-pad">
+      <view class="ui-title">手机号</view>
+
+      <view wx:if="{{phoneVerified}}" class="ui-between phone-row">
+        <text class="ui-note">已验证</text>
+        <view class="phone-val">
+          <text class="phone-num ui-num">{{phone}}</text>
+          <text class="ui-tag ui-tag-ok">已验证</text>
+        </view>
+      </view>
+
+      <block wx:else>
+        <view wx:if="{{phoneAuthMode === 'manual'}}" class="ui-field">
+          <text class="ui-field-label">手机号</text>
+          <input class="ui-input" type="number" placeholder="请输入电话"
+                 value="{{phone}}" bindinput="onPhoneInput" maxlength="16" />
+        </view>
+        <view wx:else class="ui-between phone-row">
+          <text class="ui-note">手机号</text>
+          <text class="phone-num ui-num">{{phone || '未绑定'}}</text>
+        </view>
+
+        <view wx:if="{{phoneAuthMode === 'manual'}}" class="phone-btn" bindtap="bindPhoneManual">绑定手机号</view>
+        <button wx:else class="phone-btn" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneAuth">微信授权获取</button>
+
+        <view class="ui-note phone-hint">手机号用于匹配学籍档案，绑定后自动显示「我的档案」。</view>
+      </block>
+    </view>
+
+    <!-- 我的档案（学籍信息，只读） -->
+    <view class="ui-card ui-card-pad">
+      <view class="ui-between">
+        <view class="ui-title title-flat">我的档案</view>
+        <text wx:if="{{hasArchive && archiveMatch === 'student_id'}}" class="ui-tag ui-tag-info">按学号匹配</text>
+        <text wx:elif="{{hasArchive}}" class="ui-tag ui-tag-info">按手机号匹配</text>
+      </view>
+
+      <block wx:if="{{hasArchive}}">
+        <view wx:for="{{archiveFields}}" wx:key="label" class="field-row">
+          <text class="field-k">{{item.label}}</text>
+          <text class="field-v">{{item.value}}</text>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="empty-inline">
+          <text class="empty-title">暂无学籍信息</text>
+          <text class="ui-note">档案由教务管理员上传。若已绑定手机号仍未显示，可输入学号匹配，或联系管理员。</text>
+        </view>
+        <view class="link-row">
+          <input class="ui-input link-input" placeholder="输入学号匹配档案"
+                 value="{{linkId}}" bindinput="onLinkId" maxlength="32" />
+          <view class="ui-pill ui-pill-primary" bindtap="tapLinkId">{{linking ? '匹配中…' : '匹配'}}</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 管理员入口 -->
+    <view wx:if="{{isAdmin}}" class="ui-card ui-card-pad">
+      <view class="ui-title">管理员</view>
+      <view class="ui-item item-flush" bindtap="tapArchiveManage">
+        <view class="ui-item-main">
+          <view class="ui-item-title">学生档案管理</view>
+          <view class="ui-item-sub">查看 / 编辑已上传学生信息</view>
+        </view>
+        <view class="ic ic-sm ic-chev"></view>
+      </view>
+    </view>
+  </block>
+</view>

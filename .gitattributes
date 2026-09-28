@@ -1,0 +1,13 @@
+# deploy/ 下的运维脚本与服务单元由 Linux 执行/解析，必须保持 LF。
+# Windows 检出时若被转成 CRLF，会导致 shebang 失效、systemd 解析异常。
+deploy/**/*.sh          text eol=lf
+deploy/**/*.service     text eol=lf
+deploy/**/*.timer       text eol=lf
+deploy/**/*.py          text eol=lf
+deploy/**/*.md          text eol=lf
+
+# agent4som 下的运维脚本与服务单元同理：由 Linux 的 bash/systemd 直接执行。
+# 此前未覆盖，导致从 Windows 同步到 DGX 的 .sh 带 CRLF，bash 报 "do\r" 语法错误。
+agent4som/scripts/*.sh     text eol=lf
+agent4som/infra/*.service  text eol=lf
+agent4som/infra/*.timer    text eol=lf

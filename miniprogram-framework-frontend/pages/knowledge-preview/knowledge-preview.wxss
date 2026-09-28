@@ -1,0 +1,53 @@
+/* pages/knowledge-preview/knowledge-preview.wxss —— 知识片段预览
+   「学籍台账」视觉系统：整屏滚动（head + scroll-view body + foot）。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx 0;
+  background: var(--canvas);
+}
+
+.head {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 8rpx 4rpx 0;
+}
+.title {
+  font-size: var(--fs-head);
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  margin-top: 20rpx;
+  padding: 32rpx;
+  box-sizing: border-box;
+  background: var(--paper);
+  border: 1rpx solid var(--line);
+  border-radius: var(--r-md);
+}
+.text {
+  font-size: var(--fs-body);
+  color: var(--ink);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.foot {
+  flex-shrink: 0;
+  padding: 20rpx 4rpx calc(24rpx + env(safe-area-inset-bottom));
+  text-align: center;
+}

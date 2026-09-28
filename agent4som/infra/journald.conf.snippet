@@ -1,0 +1,17 @@
+# Agent for SOM — journald 配置建议
+# 合并到 /etc/systemd/journald.conf 或 /etc/systemd/journald.conf.d/agent4som.conf
+#
+# 部署:
+#   sudo mkdir -p /etc/systemd/journald.conf.d
+#   sudo cp infra/journald.conf.snippet /etc/systemd/journald.conf.d/agent4som.conf
+#   sudo systemctl restart systemd-journald
+
+[Journal]
+# 日志最大占用磁盘空间（默认 10% 文件系统，此处显式限制）
+SystemMaxUse=2G
+# 日志最大保留天数
+MaxRetentionSec=30day
+# 单个日志文件最大大小
+RuntimeMaxUse=500M
+# 转发到 wall（关闭，避免终端噪音）
+ForwardToWall=no

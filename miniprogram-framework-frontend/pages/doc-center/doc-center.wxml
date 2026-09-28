@@ -1,0 +1,90 @@
+<!-- pages/doc-center/doc-center.wxml —— 文件中心（012） -->
+<view class="page">
+  <view wx:if="{{!enabled}}" class="ui-empty">文件中心未启用</view>
+
+  <block wx:else>
+    <!-- 顶部：状态 + 上传 -->
+    <view class="ui-card ui-card-pad">
+      <view class="ui-title">公共教学文件统一上传</view>
+      <text class="ui-note">{{statText}}</text>
+
+      <picker class="ui-picker-wrap up-picker" mode="selector" range="{{uploadTypes}}" value="{{uploadTypeIdx}}" bindchange="onUploadType">
+        <view class="ui-picker">
+          <text class="ui-picker-k">类型</text>
+          <text class="ui-picker-v">{{uploadType}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+
+      <view class="ui-btn ui-btn-primary up-btn" bindtap="onUpload">选择文件上传</view>
+      <text class="ui-note up-hint">只纳公共教学文件（培养方案/政策/大纲/清单…）；学生数据文件（成绩单/名单/选课结果）请走「选课预警」。</text>
+    </view>
+
+    <!-- 筛选 -->
+    <view class="ui-pickers">
+      <picker class="ui-picker-wrap" mode="selector" range="{{docTypes}}" value="{{filterTypeIdx}}" bindchange="onFilterType">
+        <view class="ui-picker">
+          <text class="ui-picker-k">类型</text>
+          <text class="ui-picker-v">{{filterType || '全部'}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+      <picker class="ui-picker-wrap" mode="selector" range="{{featureFilterOptions}}" value="{{filterFeatureIdx}}" bindchange="onFilterFeature">
+        <view class="ui-picker">
+          <text class="ui-picker-k">功能</text>
+          <text class="ui-picker-v">{{filterFeatureLabel || '全部'}}</text>
+          <view class="ic ic-sm ic-chevdown"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view wx:if="{{!files.length}}" class="ui-empty">暂无文件</view>
+    <view wx:else class="ui-list">
+      <view wx:for="{{files}}" wx:key="id" class="ui-item file-item">
+        <view class="ui-item-main">
+          <view class="ui-item-row">
+            <text class="ui-item-title file-name">{{item.file_name}}</text>
+            <text class="ui-tag ui-tag-info">{{item.doc_type}}</text>
+          </view>
+          <text class="ui-item-sub">适用功能：{{item.featureText || '（未设置）'}}</text>
+          <text class="ui-item-sub">适用年级：{{item.gradeText || '（未设置）'}}<text wx:if="{{item.subject_major}}"> · 归属专业：{{item.subject_major}}</text></text>
+          <text class="ui-item-sub">解析：{{item.jobText}}</text>
+          <view class="ui-actions file-acts">
+            <view class="ui-pill" data-id="{{item.id}}" bindtap="onEditApplicability">设适用性</view>
+            <view class="ui-pill" data-id="{{item.id}}" bindtap="onRetry">重解析</view>
+            <view class="ui-pill ui-pill-danger" data-id="{{item.id}}" bindtap="onDelete">删除</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 适用性弹层 -->
+  <view wx:if="{{showSheet}}" class="ui-sheet-mask" bindtap="onSheetClose">
+    <view class="ui-sheet" catchtap="noop">
+      <view class="ui-sheet-title">设置适用性：{{sheetFile.file_name}}</view>
+      <view class="sheet-label">适用功能</view>
+      <view class="ui-chips">
+        <view wx:for="{{featureOptions}}" wx:key="key" wx:for-index="idx"
+              class="ui-chip {{item.on ? 'ui-chip-on' : ''}}"
+              data-idx="{{idx}}" bindtap="onToggleFeature">{{item.label}}</view>
+      </view>
+      <view class="sheet-label">适用年级</view>
+      <view class="ui-chips">
+        <view wx:for="{{gradeOptions}}" wx:key="label" wx:for-index="idx"
+              class="ui-chip {{item.on ? 'ui-chip-on' : ''}}"
+              data-idx="{{idx}}" bindtap="onToggleGrade">{{item.label}}</view>
+      </view>
+      <view class="sheet-label">适用专业</view>
+      <view class="ui-chips">
+        <view wx:for="{{majorOptions}}" wx:key="label" wx:for-index="idx"
+              class="ui-chip {{item.on ? 'ui-chip-on' : ''}}"
+              data-idx="{{idx}}" bindtap="onToggleMajor">{{item.label}}</view>
+      </view>
+      <view class="ui-sheet-actions">
+        <view class="ui-btn ui-btn-ghost" bindtap="onSheetClose">取消</view>
+        <view class="ui-btn ui-btn-primary" bindtap="onSaveApplicability">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

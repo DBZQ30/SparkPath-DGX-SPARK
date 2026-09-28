@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly restart of GPU embedding/reranker services (OOM mitigation)
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/gpu-services/README.md
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+Persistent=false
+
+[Install]
+WantedBy=timers.target

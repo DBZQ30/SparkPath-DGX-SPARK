@@ -1,0 +1,30 @@
+[Unit]
+Description=Qwen3-Reranker 0.6B API (dgx, GPU) - :8002
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/gpu-services/README.md
+After=network-online.target dgx-embedding.service
+Wants=network-online.target
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/models/models
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/<DGX_USER>
+Environment=NO_PROXY=127.0.0.1,localhost
+Environment=HOST=127.0.0.1
+Environment=PORT=8002
+# API_KEY 由 /etc/sparkpath/gpu-services.env 提供（见 gpu-services.env.example）
+EnvironmentFile=-/etc/sparkpath/gpu-services.env
+Environment=MODEL_PATH=/home/<DGX_USER>/models/models/Qwen3-Reranker-0.6B
+ExecStart=/home/<DGX_USER>/venvs/vllm/bin/python /home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/gpu-services/reranker_server.py
+Restart=on-failure
+RestartSec=30
+NoNewPrivileges=yes
+PrivateTmp=yes
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

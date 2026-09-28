@@ -1,0 +1,159 @@
+/* pages/warning/warning.wxss —— 选课预警（管理员 · 「学籍台账」视觉系统）
+   信息分层：ui-section 分节 / ui-card 分组 / ui-banner-warn 与 ui-banner-danger 警示
+   / ui-tag-* 状态标签；行内操作统一 ≥64rpx 药丸。 */
+
+page {
+  background: var(--canvas);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 24rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* ── 年级分区 tab（v6）：横向滚动药丸 ── */
+.grade-tabs {
+  display: flex;
+  gap: 12rpx;
+  overflow-x: auto;
+  padding-bottom: 4rpx;
+}
+.grade-tabs .ui-chip { flex-shrink: 0; }
+.grade-active { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 600; }
+.grade-add { color: var(--ink); border-style: dashed; border-color: var(--ink-2); }
+
+/* ── 学期配置状态行（v6.3）── */
+.row-pill { display: flex; align-items: center; gap: 8rpx; }
+
+/* ── 上传模块 ── */
+.module-card {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 28rpx;
+}
+.module-body { flex: 1; min-width: 0; }
+.module-label { display: block; font-size: var(--fs-body-lg); font-weight: 600; color: var(--ink); }
+.module-desc { display: block; margin-top: 4rpx; font-size: var(--fs-meta); color: var(--ink-3); line-height: 1.5; }
+.major-btns { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 12rpx; }
+
+/* ── 逐文件上传日志（状态机）── */
+.upload-log { display: flex; flex-direction: column; gap: 12rpx; }
+.log-item { padding: 18rpx 24rpx; }
+.log-item.done { background: var(--jade-soft); border-color: var(--jade-soft); }
+.log-item.failed { background: var(--seal-soft); border-color: var(--seal-soft); }
+.log-item.pending { background: var(--amber-soft); border-color: var(--amber-soft); }
+.log-line { display: flex; align-items: center; gap: 12rpx; }
+.log-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-meta);
+  color: var(--ink);
+}
+.log-msg { flex-shrink: 0; max-width: 46%; font-size: var(--fs-micro); text-align: right; line-height: 1.5; }
+.log-ok { color: var(--jade); }
+.log-fail { color: var(--seal); }
+.log-pending { color: var(--amber); }
+.log-progress { color: var(--ink-2); }
+.log-bar { margin-top: 12rpx; }
+
+/* ── 已上传文件状态 ── */
+.missing-tip { margin-bottom: 8rpx; }
+.status-group { margin-bottom: 8rpx; }
+.group-title { color: var(--ink-2); }
+
+.status-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10rpx;
+}
+.status-line { display: flex; align-items: center; gap: 12rpx; }
+.status-major {
+  flex-shrink: 0;
+  max-width: 260rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--ink);
+}
+.major-other { color: var(--ink-3); font-weight: 400; font-size: var(--fs-micro); }
+.status-file {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+}
+.status-empty { color: var(--ink-3); }
+.status-right { display: flex; align-items: center; flex-wrap: wrap; gap: 12rpx; }
+.status-time { font-size: var(--fs-micro); color: var(--ink-3); }
+.status-error { display: block; }
+
+/* 解析状态色调（2026-09-24 去掉「有效期」概念后，仅服务解析状态） */
+.parse-ok { background: var(--jade-soft); color: var(--jade); }
+.parse-bad { background: var(--seal-soft); color: var(--seal); }
+.parse-pending { background: var(--amber-soft); color: var(--amber); }
+
+/* ── 选课检查 ── */
+.check-actions { display: flex; gap: 16rpx; }
+.trigger-btn, .export-btn { margin: 0; }
+.trigger-btn::after, .export-btn::after { border: none; }
+.export-btn[disabled] { color: var(--ink-3); background: var(--canvas); border-color: var(--line); }
+.summary-card { margin-top: 0; }
+.summary-text { font-size: var(--fs-meta); white-space: pre-wrap; word-break: break-all; }
+
+/* ── 未选课警示（朱砂）── */
+.absent-card { padding: 20rpx 24rpx; }
+.absent-title { display: block; font-weight: 600; line-height: 1.5; }
+.absent-row {
+  display: flex;
+  align-items: baseline;
+  margin-top: 8rpx;
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.absent-id { margin-left: 12rpx; font-size: var(--fs-micro); color: var(--ink-3); }
+.absent-major { margin-left: auto; font-size: var(--fs-micro); color: var(--ink-3); }
+
+/* ── 豁免课程警告（琥珀）── */
+.exempt-card { padding: 20rpx 24rpx; }
+.exempt-title { display: block; font-weight: 600; line-height: 1.5; }
+.exempt-major { margin-top: 8rpx; font-size: var(--fs-meta); line-height: 1.5; }
+.exempt-major-name { font-weight: 600; }
+
+/* ── 检查名单 ── */
+.student-row { align-items: center; }
+.student-name { flex: 0 1 auto; }
+.student-id { flex-shrink: 0; font-size: var(--fs-micro); color: var(--ink-3); }
+.sr-chips { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 12rpx; }
+.sum-gap { background: var(--amber-soft); color: var(--amber); }
+.sum-miss { background: var(--seal-soft); color: var(--seal); font-weight: 600; }
+.reason-btn { flex-shrink: 0; }
+
+/* ── 豁免记录折叠区 ── */
+.waiver-card { padding: 0; }
+.waiver-head { padding: 0 28rpx; }
+.waiver-hint { display: block; padding: 0 28rpx 20rpx; }
+.waiver-row { padding: 24rpx 28rpx; align-items: center; }
+.waiver-label {
+  display: block;
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  color: var(--ink);
+  word-break: break-all;
+  line-height: 1.5;
+}
+.waiver-del { flex-shrink: 0; }

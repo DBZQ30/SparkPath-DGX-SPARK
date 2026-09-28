@@ -1,0 +1,99 @@
+<view class="page">
+  <view class="ui-masthead">
+    <view class="ui-masthead-title">{{assistantTitle}}</view>
+    <view class="who">
+      <view class="who-dot {{loginStatus === '已登录' ? 'who-dot-on' : ''}}"></view>
+      <text class="who-text">{{loginStatus}}</text>
+    </view>
+    <view class="ui-icon-btn" bindtap="tapMenu">
+      <view class="ic ic-sm ic-more"></view>
+    </view>
+  </view>
+
+  <scroll-view
+    class="messages"
+    scroll-y
+    scroll-with-animation
+    scroll-into-view="{{scrollIntoView}}"
+  >
+    <view wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}" class="msg-block">
+      <view class="{{item.rowClass}}">
+        <view wx:if="{{item.role === 'assistant'}}" class="seal-mark">{{sealChar}}</view>
+        <view class="{{item.bubbleClass}}">
+          <rich-text nodes="{{item.content}}" user-select="true"></rich-text>
+        </view>
+      </view>
+
+      <!-- 执行过程（默认收起）：点开就地展开时间轴，或进全屏观测台 -->
+      <view wx:if="{{item.trace}}" class="trace-wrap">
+        <view class="tracebar" data-index="{{index}}" bindtap="tapToggleTrace">
+          <view class="trace-ic">✓</view>
+          <text class="trace-t">执行过程</text>
+          <text class="trace-m">{{item.trace.summary.stepCount}} 步 · {{item.trace.summary.durationText}}</text>
+          <text class="trace-arw">{{item.traceOpen ? '▴' : '▾'}}</text>
+        </view>
+        <view wx:if="{{item.traceOpen}}" class="trace-panel">
+          <view wx:for="{{item.trace.summary.steps}}" wx:for-item="st" wx:key="key" class="trace-row">
+            <text class="trace-ck">✓</text>
+            <text class="trace-f">{{st.title}}</text>
+            <text class="trace-m2">{{st.meta}}</text>
+          </view>
+          <view class="trace-full" data-trace="{{item.trace.id}}" bindtap="tapOpenTrace">全屏查看 ↗</view>
+        </view>
+      </view>
+
+      <!-- 运行中：可进全屏看实时执行轨迹 -->
+      <view wx:if="{{item.loading}}" class="trace-wrap">
+        <view class="tracebar" bindtap="tapOpenLiveTrace">
+          <view class="trace-ic">◌</view>
+          <text class="trace-t">执行过程</text>
+          <text class="trace-m">实时</text>
+          <text class="trace-arw">↗</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空态引导：只在仅有欢迎语时出现 -->
+    <view wx:if="{{messages.length <= 1}}" class="suggest">
+      <text class="suggest-label">可以这样问我</text>
+      <view class="suggest-chips">
+        <view
+          wx:for="{{suggestions}}"
+          wx:key="*this"
+          class="suggest-chip"
+          data-text="{{item}}"
+          bindtap="tapSuggestion"
+        >{{item}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="composer">
+    <textarea
+      class="chat-input"
+      value="{{inputValue}}"
+      placeholder="{{chatPlaceholder}}"
+      bindinput="onInput"
+      bindconfirm="sendMessage"
+      adjust-position="{{true}}"
+      auto-height="{{true}}"
+      maxlength="500"
+      show-confirm-bar="{{false}}"
+    />
+    <view
+      class="send-button {{(!inputValue || loading) ? 'send-disabled' : ''}}"
+      bindtap="sendMessage"
+    >
+      <view wx:if="{{loading}}" class="send-loading"></view>
+      <view wx:else class="ic ic-send"></view>
+    </view>
+  </view>
+
+  <!-- 更多操作（清空对话收进这里） -->
+  <view wx:if="{{showMenu}}" class="menu-mask" bindtap="closeMenu" catchtouchmove="noop">
+    <view class="menu-sheet" catchtap="noop">
+      <view class="menu-item" bindtap="tapClearConversation">清空对话</view>
+      <view class="menu-item menu-cancel" bindtap="closeMenu">取消</view>
+    </view>
+  </view>
+</view>

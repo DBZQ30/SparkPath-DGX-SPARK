@@ -1,0 +1,97 @@
+[project]
+name = "agent4som"
+version = "0.1.0"
+description = "SOM (School of Management) Knowledge Base — RAG pipeline + WeCom AI assistant"
+requires-python = ">=3.11"
+dependencies = [
+    "chromadb==1.5.9",
+    "pydantic>=2.0",
+    "requests>=2.32",
+    "httpx",
+    "llama-index-core>=0.14",
+    "pdfminer.six",
+    "openpyxl",
+    "python-docx",
+    "python-pptx",
+    "pypdf",
+    "Pillow",
+    "xlrd",
+    "fastapi",
+    "uvicorn",
+    "python-multipart",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    # integration: 需要本机常驻服务（chroma-server / GPU 推理等），离线开发机用 -m "not integration" 跳过
+    "integration: requires local services (chroma-server, GPU inference)",
+    # network: 需要外网或校园网访问
+    "network: requires external network access",
+    # security: 安全测试套件（tests/security/），离线可跑
+    "security: security test suite (tests/security/)",
+    # samples: 依赖真实样本（academicwarning/docs/、data/SmartGuide/，均 gitignored，
+    # 仅开发机集成测试）。离线干净检出用 -m "not samples" 跳过（样本缺失时自动 skip）
+    "samples: requires real sample files (gitignored, dev machine only)",
+]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_return_any = false
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+    "venv",
+    "data",
+    ".hermes",
+    "hermes-agent",
+    "shared_skills/*/evals/environment",
+]
+
+[tool.ruff.lint]
+# 规则集分两层（规范见 docs/05-notes/code-standards/README.md）：
+#   1) 基础正确性 E/F/W；
+#   2) clean-code 扩展 B(bugbear) / SIM(simplify) / C4(comprehensions) /
+#      RET(return) / RUF(ruff 专属) + PLW1510(subprocess check)，均经
+#      2026-09-26 审计逐条核对后引入（见 audit-2026-09-26.md）。
+# 暂不含 I（导入排序）——存量导入顺序各异，重排会制造无意义大 diff。
+select = ["E", "F", "W", "B", "SIM", "C4", "RET", "RUF", "PLW1510"]
+ignore = [
+    "E501",  # 行长由 line-length 控制，长 URL/中文字符串豁免
+    "E402",  # 本仓库大量 sys.path 引导后置 import（kb_init / service_manager 等），属既定模式
+    "E701",  # 存量单行 if/def 风格
+    "E702",  # 存量分号单行风格
+    "E731",  # 存量 lambda 赋值
+    "E741",  # 存量短变量名（l/I）出现在解析器底层循环，重命名风险大于收益
+    "F841",  # 少量死赋值留作后续清理（多数在测试与脚本中，无运行时影响）
+    # ── 以下为 clean-code 扩展的豁免（均为审计确认的误报模式）─────────
+    "RUF001", "RUF002", "RUF003",  # 中文全角标点在注释/字符串里，中文仓库必然触发
+    "B023",   # 循环内定义闭包——本仓库惯用「当轮定义、当轮调用」模式，无跨迭代持有
+    "SIM115", # 刻意持锁/跨 finally 使用而返回文件句柄（sync_jxtz 文件锁等）
+    "SIM118", # sqlite3.Row 的 in/迭代产出的是「值」而非键，ruff 无类型信息无法区分，
+              # 该规则的 autofix 曾把 row.keys() 改成 row 导致行转换全空（2026-09-26 回归）
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI 的依赖注入默认参数（File(...) / Body(...) 等）是官方惯用法，非 B008 问题
+extend-immutable-calls = [
+    "fastapi.Depends", "fastapi.File", "fastapi.Form", "fastapi.Body",
+    "fastapi.Header", "fastapi.Query", "fastapi.Path", "fastapi.Cookie",
+    "Depends", "File", "Form", "Body", "Header", "Query", "Path", "Cookie",
+]
+
+[tool.coverage.run]
+source = [
+    "knowledge_base",
+    "academicwarning",
+    "trainingplan",
+    "doccenter",
+    "management_flow",
+    "miniapp_proxy",
+]
+omit = ["tests/*", "*/tests/*", "scripts/*"]

@@ -1,0 +1,86 @@
+<view class="page">
+  <view class="ui-utilbar">
+    <view class="ui-role">{{roleLabel}}</view>
+    <view class="ui-utilbar-btn" bindtap="tapRefresh">
+      <view class="ic ic-sm ic-refresh"></view>
+      <text>刷新</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <view class="ui-search">
+      <view class="ic ic-sm ic-search"></view>
+      <input
+        class="ui-search-input"
+        value="{{keyword}}"
+        bindinput="onSearch"
+        placeholder="搜索功能，如 培养方案、预警"
+        confirm-type="search"
+      />
+      <view wx:if="{{keyword}}" class="ui-search-clear" bindtap="clearSearch">
+        <view class="ic ic-sm ic-close"></view>
+      </view>
+    </view>
+
+    <view wx:if="{{loginStatus && loginStatus !== '已登录'}}" class="login-hint">{{loginStatus}}</view>
+
+    <view wx:for="{{groups}}" wx:key="title" class="ui-group">
+      <view class="ui-group-label">{{item.title}}</view>
+      <view class="ui-card">
+        <view
+          wx:for="{{item.items}}"
+          wx:for-item="it"
+          wx:key="key"
+          class="ui-row"
+          data-key="{{it.key}}"
+          bindtap="tapCard"
+        >
+          <view class="ui-ico"><view class="ic {{it.icon}}"></view></view>
+          <view class="ui-txt">
+            <view class="ui-lbl">{{it.label}}</view>
+            <view class="ui-desc">{{it.desc}}</view>
+          </view>
+          <view wx:if="{{it.badge}}" class="ui-badge">{{it.badge}}</view>
+          <view class="ic ic-sm ic-chev ui-chev"></view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{!groups.length}}" class="ui-empty">
+      {{keyword ? '没有匹配的功能' : '暂无可用的功能，请先登录'}}
+    </view>
+  </view>
+
+  <!-- 处理中 -->
+  <view wx:if="{{loading}}" class="loading-mask">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">处理中...</text>
+  </view>
+
+  <!-- 操作结果 -->
+  <view wx:if="{{resultVisible}}" class="result-overlay" bindtap="closeResult">
+    <view class="result-card" catchtap="preventBubble">
+      <view class="result-header">
+        <text class="result-title">操作结果</text>
+        <view class="result-close" bindtap="closeResult"><view class="ic ic-sm ic-close"></view></view>
+      </view>
+      <scroll-view class="result-body" scroll-y>
+        <text class="result-text">{{resultText}}</text>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 认证申请弹窗 -->
+  <view wx:if="{{showAuthForm}}" class="modal-overlay" catchtap="cancelAuth">
+    <view class="modal-card" catchtap="preventBubble">
+      <view class="modal-title">申请{{authType === 'teacher' ? uiText.AUTH_TEACHER_LABEL : '管理员'}}认证</view>
+      <input class="modal-input" placeholder="姓名" value="{{authName}}" bindinput="onAuthName" />
+      <input class="modal-input" placeholder="教职工号" value="{{authStaffId}}" bindinput="onAuthStaffId" />
+      <input wx:if="{{authType === 'admin'}}" class="modal-input" placeholder="申请理由" value="{{authReason}}" bindinput="onAuthReason" />
+      <view class="modal-btns">
+        <view class="ui-btn ui-btn-ghost" catchtap="cancelAuth">取消</view>
+        <view class="ui-btn ui-btn-primary" catchtap="submitAuth">提交</view>
+      </view>
+    </view>
+  </view>
+</view>

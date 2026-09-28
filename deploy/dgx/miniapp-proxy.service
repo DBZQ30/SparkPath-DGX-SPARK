@@ -1,0 +1,23 @@
+[Unit]
+Description=Miniapp Proxy (FastAPI :8020 -> hermes :8010) [dgx variant]
+Documentation=file:/home/<DGX_USER>/SparkPath-DGX-SPARK/deploy/dgx/README.md
+After=hermes-gateway@jwc-assistant.service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=<DGX_USER>
+Group=<DGX_USER>
+WorkingDirectory=/home/<DGX_USER>/SparkPath-DGX-SPARK/agent4som/miniapp_proxy
+# dgx 差异：端口 8020（:8000 已被 vLLM Qwen3.8-27B 占用），且只绑本机
+# （仅被 accapi-tunnel 的 SSH 反向隧道访问，无需对外暴露）
+ExecStart=/home/<DGX_USER>/.hermes/hermes-agent/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8020
+Restart=always
+RestartSec=3
+NoNewPrivileges=yes
+PrivateTmp=yes
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,118 @@
+<!-- pages/trace/trace.wxml —— 执行轨迹（演示模式：暗色观测台）
+     结构：计时条（常驻） / Agent 拓扑（canvas 2d） / 六拍时间轴（滚动） / 演示控制条（常驻）
+     动效只在事件到达时触发（无常驻动画循环），见 docs/UI-DESIGN-SYSTEM.md -->
+<view class="page">
+
+  <!-- ── 计时条：只显示总耗时 + 运行状态（常驻）── -->
+  <view class="tele">
+    <view class="g">
+      <text class="k">{{done ? '总耗时' : '计时'}}</text>
+      <text class="v mono">{{elapsedText}}</text>
+    </view>
+    <view class="g g-state">
+      <view class="live {{running ? '' : 'idle'}}"><view class="dot"></view><text>{{running ? '推理中' : (paused ? '已暂停' : (done ? '完成' : '空闲'))}}</text></view>
+    </view>
+  </view>
+
+  <!-- ── Agent 拓扑：命中 skill 时能量脉冲沿连线传播 ── -->
+  <view class="topo">
+    <canvas type="2d" id="topo" class="topo-canvas"></canvas>
+  </view>
+
+  <!-- ── 操作提示 + 演示标注 ── -->
+  <view class="hintbar">
+    <text class="tip">{{live ? '实时执行 · 点步骤可展开' : '点步骤可展开 · 可暂停细看'}}</text>
+  </view>
+  <view wx:if="{{demo}}" class="demo-note">{{demoNote}}</view>
+
+  <!-- ── 六拍时间轴 ── -->
+  <scroll-view class="tl" scroll-y scroll-into-view="{{scrollTo}}" scroll-with-animation>
+    <view wx:for="{{steps}}" wx:key="key" id="step-{{item.key}}" class="step {{item.cls}}"
+          data-key="{{item.key}}" bindtap="tapStep">
+      <view class="sh">
+        <view class="idx">{{item.state === 'done' ? '✓' : item.idx}}</view>
+        <text class="ttl">{{item.icon}} {{item.title}}</text>
+        <text wx:if="{{item.state === 'done'}}" class="sum">{{item.summary}}</text>
+        <text wx:elif="{{item.state === 'run' && item.badge}}" class="badge">{{item.badge}}</text>
+      </view>
+
+      <!-- ① 提问：问题原文常驻显示（不受播放/展开状态影响；问题很短，不占地方） -->
+      <view wx:if="{{item.key === 'ask'}}" class="body">
+        <view class="q">{{query}}</view>
+      </view>
+
+      <!-- 展开条件：进行中 / 结果拍 / 用户手动展开 -->
+      <block wx:if="{{item.state === 'run' || item.key === 'result' || item.manualOpen}}">
+
+        <!-- ② 思考 / ⑤ 思考执行（同一形态，reasoning 流式）
+             运行中限高、底部对齐只露最新几行，避免霸屏；波形紧随其下常驻可见 -->
+        <view wx:if="{{item.key === 'think' || item.key === 'reflect'}}" class="body">
+          <view wx:if="{{item.text}}" class="{{item.state === 'run' ? 'think think-live' : 'think'}}">{{item.text}}<text wx:if="{{item.state === 'run'}}" class="cursor"></text></view>
+          <view wx:if="{{item.state === 'run'}}" class="wave">
+            <view wx:for="{{waveBars}}" wx:key="index" class="wbar"
+                  style="height:{{item.h}}%;animation-delay:-{{item.d}}s"></view>
+            <text class="wave-lbl">reasoning</text>
+            <text class="wave-tk">{{item.tokens}} tok</text>
+          </view>
+          <view wx:if="{{item.state === 'run'}}" class="toks">
+            <view wx:for="{{item.blocks}}" wx:key="index" class="blk {{item}}"></view>
+          </view>
+        </view>
+
+        <!-- ③ 命中 Skill（可能命中多个，全部列出） -->
+        <view wx:elif="{{item.key === 'skill'}}" class="body">
+          <view wx:for="{{skills}}" wx:for-item="sk" wx:key="name" class="skill">
+            <view class="gem"></view>
+            <view class="skill-txt">
+              <text class="nm">{{sk.name}}</text>
+              <text wx:if="{{sk.description}}" class="why">{{sk.description}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- ④ 开始计算 / 搜索 -->
+        <view wx:elif="{{item.key === 'flow'}}" class="body">
+          <view wx:for="{{tools}}" wx:key="title" class="sub">
+            <text class="sub-ck {{item.state}}">{{item.state === 'done' ? '✓' : '▶'}}</text>
+            <text class="sub-f">{{item.title}}</text>
+            <text class="sub-t">{{item.durationText}}</text>
+          </view>
+          <view wx:if="{{files.length}}" class="files">
+            <view wx:for="{{files}}" wx:key="name" class="fchip"><view class="dt"></view><text>{{item.name}}</text></view>
+          </view>
+        </view>
+
+        <!-- ⑥ 得到结果 -->
+        <view wx:elif="{{item.key === 'result'}}" class="body">
+          <view wx:if="{{result}}" class="res-wrap">
+            <view wx:if="{{stamped}}" class="stamp">已核<text class="stamp-sub">教务</text></view>
+            <text class="res">{{result.answer}}</text>
+            <view class="arts" wx:if="{{result.artifacts.length}}">
+              <view wx:for="{{result.artifacts}}" wx:key="label" class="art">
+                <view class="dt"></view>
+                <text class="art-l">{{item.label}}</text>
+                <text class="art-r">{{item.value}}</text>
+              </view>
+            </view>
+            <view class="metrics">
+              <view class="metric"><text class="mk">工具</text><text class="mv">{{metrics.tools}}</text></view>
+              <view class="metric"><text class="mk">Skill</text><text class="mv nv">{{metrics.skills}}</text></view>
+              <view class="metric"><text class="mk">tokens</text><text class="mv">{{metrics.tokens === null ? '—' : metrics.tokens}}</text></view>
+              <view class="metric"><text class="mk">耗时</text><text class="mv">{{metrics.seconds}}</text></view>
+            </view>
+          </view>
+        </view>
+
+      </block>
+    </view>
+    <view class="tl-end"></view>
+  </scroll-view>
+
+  <!-- ── 演示控制条：现场控场 / 暂停细看 / 随时重放 ── -->
+  <view class="ctrl">
+    <view wx:if="{{!live}}" class="btn gho" bindtap="tapReplay">↻ 重播</view>
+    <view wx:if="{{!done && !live}}" class="btn gho" bindtap="tapPause">{{paused ? '▶ 继续' : '⏸ 暂停'}}</view>
+    <view wx:if="{{done}}" class="btn pri" bindtap="tapBack">在对话中继续</view>
+    <view wx:elif="{{!live}}" class="btn pri" bindtap="tapNextBeat">▶ 下一拍</view>
+  </view>
+</view>

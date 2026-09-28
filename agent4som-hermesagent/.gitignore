@@ -1,0 +1,57 @@
+# Sensitive
+.env
+.env.bak
+*.bak*
+auth.json
+roles.json
+gateway_state.json
+processes.json
+channel_directory.json
+
+# Databases
+state.db
+state.db-shm
+state.db-wal
+kanban.db
+kanban.db.dispatch.lock
+kanban.db.init.lock
+kanban/.dispatcher.lock
+models_dev_cache.json
+
+# Caches
+cache/
+sessions/
+image_cache/
+audio_cache/
+chroma_db/
+logs/
+
+# Runtime
+gateway.lock
+auth.lock
+gateway.pid
+*.log
+cron/
+
+# IDE / misc
+.skills_prompt_snapshot.json
+.update_check
+.hermes_history
+hooks
+lsp/
+memories/
+pairing/
+sandboxes/
+skills/
+gateway/restart_loop.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# 上游 Hermes Agent 框架源码（体积大，单独安装，不入库）
+# 安装方式见 README.md；本项目对框架的定制见 ../agent4som/hermes_overlay/
+hermes-agent/
+
+# vendored 二进制（uv / uvx / tirith，按需安装，不入库；见 README §6）
+bin/
