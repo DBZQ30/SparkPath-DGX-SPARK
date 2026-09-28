@@ -1354,3 +1354,24 @@ step-5-preview RAG 问答 **55s** / Skill 调用 **15s**。
 > ⚠️ 评测的 agent 模型由 `--agent-model` 显式指定（`claude-code=step-3.7-flash` /
 > `codex=deepseek-flash`），**与 `config.yaml` 的主对话模型无关**，不受本次切换影响。
 
+---
+
+## 附：2026-09-28 投稿版最终评测（revision `85746b6`）
+
+> 三个 skill **三 tier 全 PASS、双侧全出分**。报告：`~/work/skilleval/rerun-20260928-1854/`
+> （`multi-path` 取同目录 `multi-path-academic-planning-rerun/`）。
+
+| skill | 版本 | scored | lift `claude-code` | lift `codex` |
+|---|---|---|---|---|
+| `academic-warning` | 4.7.0 | 72/72 | **+22.3 点** | **+10.1 点** |
+| `training-plan-interpretation` | 1.5.0 | 47/47 | **+24.0 点** | **+22.2 点** |
+| `multi-path-academic-planning` | 1.4.0 | 48/48 | **+34.1 点** | **+9.3 点** |
+
+### 两个 `neutral` 诱因（本轮各遇一次，均已解决）
+
+1. **看门狗误杀**（9-27 首轮）→ 阈值放宽为 `--idle-min 8 --max-trial-min 45` → 本轮**零击杀**。
+2. **StepFun 451 内容审查**（本轮 `multi-path` 首轮）→ `claude-code` with 侧
+   `plan-neg-interpret` trial 被拦 → `neutral(48/49)` → **补跑一次即通过**（451 概率性，约 20–35%）。
+
+> 两者都与 skill 质量无关，但都会让 `execution_status=failed` → `verdict=neutral`（即使五维全 PASS）。
+

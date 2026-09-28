@@ -40,28 +40,32 @@ tail -f ~/work/skilleval/rerun-<时间戳>/<skill>/progress.log
 - ⚠️ **`verdict` 实际由 `execution_status` 决定**：只要任一侧有 trial errored/未出分 → `failed` → verdict `neutral`、BENCHMARK `INCOMPLETE`，**即使五维全 PASS**。
   → 要拿 `pass`，**必须双侧全出分**（见 §6 看门狗、§2 provider）。
 
-**当前基线（2026-09-28，`claude-code` + `codex` 双 agent；提交比赛作品版）**：
+**当前基线（2026-09-28 投稿版，`claude-code` + `codex` 双 agent）**：
 
 | skill | Tier 1 | Tier 2 | Tier 3 | scored | lift (`claude-code` / `codex`) |
 |---|:--:|:--:|:--:|:--:|--:|
-| `academic-warning` | 11/11 | PASS | pass | 78/78 | **+19.8 / +22.0 点** |
-| `training-plan-interpretation` | 11/11 | PASS | pass | 46/46 | **+24.3 / +15.9 点** |
-| `multi-path-academic-planning` | 11/11 | PASS | pass | 48/48 | **+33.1 / +14.7 点** |
+| `academic-warning` | 11/11 | PASS | pass | 72/72 | **+22.3 / +10.1 点** |
+| `training-plan-interpretation` | 11/11 | PASS | pass | 47/47 | **+24.0 / +22.2 点** |
+| `multi-path-academic-planning` | 11/11 | PASS | pass | 48/48 | **+34.1 / +9.3 点** |
 
-报告：`~/work/skilleval/rerun-20260927-2246/`（revision `73fa2372`）；
-三者 BENCHMARK 均为官方生成版 **"✅ Overall verdict: PASS — Recommended for publication"**。
-**本轮零看门狗误杀**（阈值已固化为 `--idle-min 8 --max-trial-min 45`）。
+报告：`~/work/skilleval/rerun-20260928-1854/`（revision `85746b6`，与比赛提交 commit 一致；
+`multi-path` 取同目录 `multi-path-academic-planning-rerun/`）。三者 BENCHMARK 均为官方生成版
+**"✅ Overall verdict: PASS — Recommended for publication"**，**本轮零看门狗击杀**。
 
 > **历史基线**：
-> - 2026-09-27（业务代码大改后重评）：`academic-warning` +28.8/+14.2 · `training-plan` +20.2/+10.5 · `multi-path` +42.1/+14.0
+> - 2026-09-28（早一轮，revision 73fa2372）：`academic-warning` +19.8/+22.0 · `training-plan` +24.3/+15.9 · `multi-path` +33.1/+14.7
+> - 2026-09-27（业务代码大改后）：`academic-warning` +28.8/+14.2 · `training-plan` +20.2/+10.5 · `multi-path` +42.1/+14.0
 > - 2026-09-26（双 agent 首轮）：`academic-warning` +22.7/+13.9 · `training-plan` +14.5/+12.7 · `multi-path` +33.0/+8.3
-> - 2026-09-25（单 agent `claude-code`）：`academic-warning` +28.5 · `training-plan` +34.8 · `multi-path` +32.1
+> - 2026-09-25（单 agent）：`academic-warning` +28.5 · `training-plan` +34.8 · `multi-path` +32.1
 >
-> ⚠️ **看门狗阈值必须用 `--idle-min 8 --max-trial-min 45`**（2026-09-27 实测）：
-> baseline 在「纯文档题」上无文档可读时，会主动 `ScheduleWakeup(1800s)` 空转 ——
-> 期间**持续有心跳写入**，idle 判据不触发，最终被 `max-trial-min` 兜底杀 → trial 未出分 →
-> `execution_status=failed` → **`verdict=neutral`（即使五维全 PASS）**。
-> `--max-trial-min 30` 会误杀；45 + idle 8 实测零击杀（9-27 补跑 / 9-28 全量均验证）。
+> ⚠️ **看门狗阈值必须用 `--idle-min 8 --max-trial-min 45`**：baseline 在「纯文档题」上无文档可读时，
+> 会主动 `ScheduleWakeup(1800s)` 空转 —— 期间**持续有心跳写入**，idle 判据不触发，
+> 最终被 `max-trial-min` 兜底杀 → trial 未出分 → `execution_status=failed` → **`verdict=neutral`**。
+> `--max-trial-min 30` 会误杀（9-27 实测）；45 + idle 8 后多轮零击杀。
+>
+> ⚠️ **`verdict=neutral` 的另一个诱因是 provider 内容审查**：StepFun 偶发返回
+> `451 The content provided or machine outputted is blocked` → agent `exit 1` → trial `Unscoreable`。
+> **概率性（约 20–35%）**，重跑即可自愈（见 README §6-36）。
 
 
 ## 2. 模型选型（**硬性**）

@@ -234,9 +234,9 @@ SparkPath 用「**大模型 + RAG 知识库 + 可执行的业务 Skill**」把�
 
 | Skill | 版本 | 定义文件 | 面向 | 一句话职责 |
 |-------|------|----------|------|-----------|
-| `training-plan-interpretation` | 1.4.0 | [`SKILL.md`](agent4som/shared_skills/training-plan-interpretation/SKILL.md) | 学生 | 培养方案智能解读：学分结构 / 课程地图 / 先修关系 / 毕业授学位条件 |
-| `multi-path-academic-planning` | 1.3.0 | [`SKILL.md`](agent4som/shared_skills/multi-path-academic-planning/SKILL.md) | 学生 | 多路径个性化学业规划：四方向四年路线图、专业分流、转专业/辅修模拟 |
-| `academic-warning` | 4.6.0 | [`SKILL.md`](agent4som/shared_skills/academic-warning/SKILL.md) | 管理员 | 选课合理性检查：识别回避专业选修等不合理选课，并导出检查名单 |
+| `training-plan-interpretation` | 1.5.0 | [`SKILL.md`](agent4som/shared_skills/training-plan-interpretation/SKILL.md) | 学生 | 培养方案智能解读：学分结构 / 课程地图 / 先修关系 / 毕业授学位条件 |
+| `multi-path-academic-planning` | 1.4.0 | [`SKILL.md`](agent4som/shared_skills/multi-path-academic-planning/SKILL.md) | 学生 | 多路径个性化学业规划：四方向四年路线图、专业分流、转专业/辅修模拟 |
+| `academic-warning` | 4.7.0 | [`SKILL.md`](agent4som/shared_skills/academic-warning/SKILL.md) | 管理员 | 选课合理性检查：识别回避专业选修等不合理选课，并导出检查名单 |
 
 > 三个 Skill 有明确的**边界分派**：结构解读走 `training-plan-interpretation`，
 > 路径规划走 `multi-path-academic-planning`，选课检查走 `academic-warning`，

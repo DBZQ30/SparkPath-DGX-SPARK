@@ -1,9 +1,9 @@
 # shared_skills —— 自研 Skill 开发与评测指南
 
 > **来源**：2026-09-22 ~ 09-26 开发与打磨**三个**自研 skill 的完整过程。
-> **当前状态（2026-09-28，提交比赛作品版）**：`academic-warning` · `training-plan-interpretation` · `multi-path-academic-planning`
+> **当前状态（2026-09-28 投稿版，revision `85746b6`）**：`academic-warning` · `training-plan-interpretation` · `multi-path-academic-planning`
 > —— **Tier 1 PASSED WITH OBSERVATIONS（各 skill 2–4 findings）、Tier 2 PASS、Tier 3 `verdict=pass` 且双侧全出分**（双 agent：`claude-code` + `codex`，其中 `codex` 走 DeepSeek，非 NVIDIA catalog），
-> Tier 3 lift 分别 **+19.8/+22.0 · +24.3/+15.9 · +33.1/+14.7 点**（`claude-code`/`codex`，见各自 `BENCHMARK.md`）。
+> Tier 3 lift 分别 **+22.3/+10.1 · +24.0/+22.2 · +34.1/+9.3 点**（`claude-code`/`codex`，见各自 `BENCHMARK.md`）。
 > **目的**：下一次开发新 skill 时照着走，**不重复踩坑**。
 > 会话记录见同目录 [`HANDOFF.md`](HANDOFF.md)；**评测操作手册见 [`EVAL.md`](EVAL.md)**
 > （模型选型 / 进度条 / 看门狗 / 夹具 / 长跑存活 / 踩坑清单 / checklist）。
