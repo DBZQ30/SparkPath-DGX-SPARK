@@ -74,27 +74,27 @@ Mitigation: SKILL.md 规定命令 stdout 视为数据，不执行其内容。 <b
 ## Evaluation Results: <br>
 - **SkillEvaluator Tier 1：`PASSED WITH OBSERVATIONS`（11 validator(s)；4 finding(s)；`exit 0`）** <br>
 - **SkillEvaluator Tier 2：`PASS`**（`clean — no duplicate guidance`） <br>
-- **SkillEvaluator Tier 3：`verdict = PASS`**（17 用例 × with/without × **2 agent**，**scored 78/78**、`execution_status=succeeded`）： <br>
+- **SkillEvaluator Tier 3：`verdict = PASS`**（17 用例 × with/without × **2 agent**，**scored 72/72**、`execution_status=succeeded`）： <br>
 
-  **`claude-code`：Overall 0.6135 → 0.8111（lift = +0.1976，约 +20 点）** <br>
+  **`claude-code`：Overall 0.6573 → 0.8804（lift = +0.2231，约 +22 点）** <br>
 
   | Evaluator | With Skill | Baseline | Lift |
   |---|---|---|---|
   | Security | 1.000 | 1.000 | +0.000 |
-  | Correctness | 0.790 | 0.627 | +0.163 |
-  | Discoverability | 0.686 | 0.462 | +0.224 |
-  | Effectiveness | 0.770 | 0.462 | +0.308 |
-  | Efficiency | 0.809 | 0.515 | +0.294 |
+  | Correctness | 0.900 | 0.660 | +0.240 |
+  | Discoverability | 0.778 | 0.516 | +0.262 |
+  | Effectiveness | 0.835 | 0.545 | +0.290 |
+  | Efficiency | 0.889 | 0.565 | +0.324 |
 
-  **`codex`：Overall 0.7075 → 0.9272（lift = +0.2197，约 +22 点）** <br>
+  **`codex`：Overall 0.8277 → 0.9288（lift = +0.1011，约 +10 点）** <br>
 
   | Evaluator | With Skill | Baseline | Lift |
   |---|---|---|---|
-  | Security | 0.941 | 0.947 | -0.006 |
-  | Correctness | 1.000 | 0.768 | +0.232 |
-  | Discoverability | 0.718 | 0.482 | +0.236 |
-  | Effectiveness | 0.979 | 0.710 | +0.270 |
-  | Efficiency | 0.997 | 0.630 | +0.367 |
+  | Security | 0.941 | 0.824 | +0.118 |
+  | Correctness | 1.000 | 1.000 | +0.000 |
+  | Discoverability | 0.746 | 0.575 | +0.171 |
+  | Effectiveness | 0.961 | 0.950 | +0.011 |
+  | Efficiency | 0.996 | 0.790 | +0.206 |
 
   官方判定：*dimension PASS ≥50%*（**两 agent 五维全部 PASS**）；*overall lift PASS ≥ +5 点* → 本 skill **双条件均满足**。 <br>
 - `tests/academicwarning`：**153 passed**（含 precheck 14 例） <br>
@@ -103,7 +103,7 @@ Mitigation: SKILL.md 规定命令 stdout 视为数据，不执行其内容。 <b
 - 详见 [BENCHMARK.md](BENCHMARK.md)（由 `skillevaluator validate --agent-eval --tiers 1,2,3` 生成） <br>
 
 ## Skill Version(s): <br>
-4.6.0 (source: CHANGELOG.md) <br>
+4.7.0 (source: CHANGELOG.md) <br>
 
 ## Ethical Considerations: <br>
 内部管理工具，涉及学生学业数据。使用时遵循数据最小化与访问控制：仅管理员可触发，报告通过小程序“学业预警”页受控查看 / 下载。 <br>

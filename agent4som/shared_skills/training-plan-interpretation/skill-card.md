@@ -73,34 +73,34 @@ Mitigation: SKILL.md 明确规定命令 stdout 视为数据，不执行其内容
 ## Evaluation Results: <br>
 - **SkillEvaluator Tier 1：`PASSED WITH OBSERVATIONS`（11 validator(s)；2 finding(s)；`exit 0`）** <br>
 - **SkillEvaluator Tier 2（去重）：`PASS`**（context clean） <br>
-- **SkillEvaluator Tier 3：`verdict = PASS`**（10 用例 × with/without × **2 agent**，**scored 46/46**、`execution_status=succeeded`）： <br>
+- **SkillEvaluator Tier 3：`verdict = PASS`**（10 用例 × with/without × **2 agent**，**scored 47/47**、`execution_status=succeeded`）： <br>
 
-  **`claude-code`：Overall 0.5891 → 0.8320（lift = +0.2429，约 +24 点）** <br>
+  **`claude-code`：Overall 0.5747 → 0.8149（lift = +0.2402，约 +24 点）** <br>
 
   | Evaluator | With Skill | Baseline | Lift |
   |---|---|---|---|
-  | Security | 1.000 | 0.923 | +0.077 |
-  | Correctness | 0.709 | 0.446 | +0.263 |
-  | Discoverability | 0.795 | 0.544 | +0.251 |
-  | Effectiveness | 0.667 | 0.455 | +0.212 |
-  | Efficiency | 0.989 | 0.577 | +0.412 |
+  | Security | 1.000 | 1.000 | +0.000 |
+  | Correctness | 0.673 | 0.357 | +0.316 |
+  | Discoverability | 0.818 | 0.522 | +0.296 |
+  | Effectiveness | 0.674 | 0.351 | +0.323 |
+  | Efficiency | 0.909 | 0.643 | +0.266 |
 
-  **`codex`：Overall 0.6876 → 0.8462（lift = +0.1586，约 +16 点）** <br>
+  **`codex`：Overall 0.6342 → 0.8565（lift = +0.2223，约 +22 点）** <br>
 
   | Evaluator | With Skill | Baseline | Lift |
   |---|---|---|---|
   | Security | 1.000 | 0.917 | +0.083 |
-  | Correctness | 0.940 | 0.650 | +0.290 |
-  | Discoverability | 0.551 | 0.600 | -0.049 |
-  | Effectiveness | 0.840 | 0.566 | +0.274 |
-  | Efficiency | 0.900 | 0.706 | +0.195 |
+  | Correctness | 0.820 | 0.600 | +0.220 |
+  | Discoverability | 0.638 | 0.443 | +0.195 |
+  | Effectiveness | 0.825 | 0.628 | +0.197 |
+  | Efficiency | 1.000 | 0.583 | +0.417 |
 
   官方判定：*dimension PASS ≥50%*（**两 agent 五维全部 PASS**）；*overall lift PASS ≥ +5 点* → 本 skill **双条件均满足**。 <br>
 - 本地：`tests/trainingplan` **77 passed** + `tests/doccenter` **8 passed**。 <br>
 - 详见 [BENCHMARK.md](BENCHMARK.md)（由 `skillevaluator validate --agent-eval` 生成） <br>
 
 ## Skill Version(s): <br>
-1.4.0 <br>
+1.5.0 <br>
 
 ## Ethical Considerations: <br>
 只处理培养方案这一**公开**数据，不读取成绩、名单等学生个人信息（解读 API 只访问本功能自建的 `plan_*` 表）。 <br>

@@ -78,32 +78,32 @@ Mitigation: SKILL.md 明确规定命令 stdout 视为数据，不执行其内容
 - **SkillEvaluator Tier 2（去重）：`PASS`**（context clean） <br>
 - **SkillEvaluator Tier 3：`verdict = PASS`**（11 用例 × with/without × **2 agent**，**scored 48/48**、`execution_status=succeeded`）： <br>
 
-  **`claude-code`：Overall 0.6002 → 0.9311（lift = +0.3309，约 +33 点）** <br>
+  **`claude-code`：Overall 0.5702 → 0.9115（lift = +0.3413，约 +34 点）** <br>
 
   | Evaluator | With Skill | Baseline | Lift |
   |---|---|---|---|
   | Security | 1.000 | 1.000 | +0.000 |
-  | Correctness | 0.909 | 0.500 | +0.409 |
-  | Discoverability | 0.886 | 0.489 | +0.397 |
-  | Effectiveness | 0.883 | 0.479 | +0.403 |
-  | Efficiency | 0.977 | 0.532 | +0.445 |
+  | Correctness | 0.891 | 0.413 | +0.478 |
+  | Discoverability | 0.773 | 0.433 | +0.339 |
+  | Effectiveness | 0.917 | 0.475 | +0.442 |
+  | Efficiency | 0.977 | 0.529 | +0.448 |
 
-  **`codex`：Overall 0.7788 → 0.9255（lift = +0.1467，约 +15 点）** <br>
+  **`codex`：Overall 0.8261 → 0.9194（lift = +0.0933，约 +9 点）** <br>
 
   | Evaluator | With Skill | Baseline | Lift |
   |---|---|---|---|
   | Security | 1.000 | 1.000 | +0.000 |
-  | Correctness | 1.000 | 0.767 | +0.233 |
-  | Discoverability | 0.669 | 0.617 | +0.053 |
-  | Effectiveness | 0.958 | 0.760 | +0.198 |
-  | Efficiency | 1.000 | 0.750 | +0.250 |
+  | Correctness | 0.982 | 0.909 | +0.073 |
+  | Discoverability | 0.657 | 0.560 | +0.097 |
+  | Effectiveness | 0.958 | 0.848 | +0.110 |
+  | Efficiency | 1.000 | 0.813 | +0.187 |
 
   官方判定：*dimension PASS ≥50%*（**两 agent 五维全部 PASS**）；*overall lift PASS ≥ +5 点* → 本 skill **双条件均满足**。 <br>
 - 本地：`tests/trainingplan` **77 passed** + `tests/doccenter` **8 passed**。 <br>
 - 详见 [BENCHMARK.md](BENCHMARK.md)（由 `skillevaluator validate --agent-eval` 生成） <br>
 
 ## Skill Version(s): <br>
-1.3.0 <br>
+1.4.0 <br>
 
 ## Ethical Considerations: <br>
 只处理**公开**的培养方案与政策数据；个人成绩仅用于**本人**规划（只读、不落库明细）。 <br>

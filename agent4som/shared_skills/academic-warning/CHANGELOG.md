@@ -1,5 +1,14 @@
 # Changelog — academic-warning
 
+## 4.7.0 — 2026-09-28
+
+**投稿版最终评测（revision `85746b6`，与比赛提交 commit 一致）。**
+
+- 结果：**三 tier 全 PASS、双侧全出分（scored 72/72）**：
+  - `claude-code`：Overall 0.6573 → 0.8804（**lift +22.3 点**），五维全部 PASS
+  - `codex`：Overall 0.8277 → 0.9288（**lift +10.1 点**），五维全部 PASS
+- 看门狗零击杀。同步刷新 `skill-card.md` 与 `BENCHMARK.md`。无 skill 内容改动（仅升 version）。
+
 ## 4.6.0 — 2026-09-28
 
 **提交比赛作品前的最终复评（revision `73fa2372`）。**

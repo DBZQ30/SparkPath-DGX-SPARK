@@ -1,7 +1,7 @@
 ---
 name: multi-path-academic-planning
 description: "Use when 本科生要做多路径学业规划：选培养方向（常规/科学研究/交叉融合/创新创业）排四年节奏、专业选择（分流）、转专业/辅修模拟（要补多少学分、压力多大）。需要专业与年级，缺一先反问；转专业/辅修还需目标专业。不适用于培养方案结构解读、学业预警/选课检查、成绩绩点排名查询。"
-version: 1.3.0
+version: 1.4.0
 license: Apache-2.0
 compatibility: |
   Designed for Claude Code, OpenCode, Codex, and Agent Skills-compatible tools.
@@ -199,4 +199,4 @@ metadata:
 
 ## 版本
 
-1.3.0
+1.4.0

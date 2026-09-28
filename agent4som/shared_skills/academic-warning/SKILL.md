@@ -1,7 +1,7 @@
 ---
 name: academic-warning
 description: "Use when 小程序管理员（admin/owner）在对话中要求触发选课合理性检查／选课预警（如“检查2023级选课”“跑一下选课预警”）或查询某年级的检查结果。负责年级确认、调用 check 命令并原样回报摘要。不适用于：上传数据文件（走小程序“学业预警”页）、非管理员请求、成绩／排名查询、完整学业预警。"
-version: 4.6.0
+version: 4.7.0
 license: Apache-2.0
 compatibility: |
   Designed for Claude Code, OpenCode, Codex, and Agent Skills-compatible tools.
@@ -171,4 +171,4 @@ metadata:
 
 ## 版本
 
-4.6.0（见 [CHANGELOG.md](CHANGELOG.md)）
+4.7.0（见 [CHANGELOG.md](CHANGELOG.md)）

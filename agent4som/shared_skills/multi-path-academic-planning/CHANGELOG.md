@@ -1,5 +1,16 @@
 # CHANGELOG — multi-path-academic-planning
 
+## 1.4.0 — 2026-09-28
+
+**投稿版最终评测（revision `85746b6`，与比赛提交 commit 一致）。**
+
+- 结果：**三 tier 全 PASS、双侧全出分（scored 48/48）**：
+  - `claude-code`：Overall 0.5702 → 0.9115（**lift +34.1 点**），五维全部 PASS
+  - `codex`：Overall 0.8261 → 0.9194（**lift +9.3 点**），五维全部 PASS
+- ⚠️ 首轮 `claude-code` with 侧 1 个 trial 被 **StepFun 451 内容审查**拦截 → `neutral(48/49)`；
+  补跑一次通过（451 为概率性，命中率约 20–35%，见 README §6-36）。
+- 看门狗零击杀。同步刷新 `skill-card.md` 与 `BENCHMARK.md`。无 skill 内容改动（仅升 version）。
+
 ## 1.3.0 — 2026-09-28
 
 **提交比赛作品前的最终复评（revision `73fa2372`）。**

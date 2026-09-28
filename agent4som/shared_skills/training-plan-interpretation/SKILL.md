@@ -1,7 +1,7 @@
 ---
 name: training-plan-interpretation
 description: "Use when 本科生要求解读某专业的培养方案（学分结构/先后修关系/毕业授学位条件）。需要专业与年级，缺一先反问；不适用于学业预警、多路径规划/转专业辅修、成绩排名查询、上传文件。"
-version: 1.4.0
+version: 1.5.0
 license: Apache-2.0
 compatibility: |
   Designed for Claude Code, OpenCode, Codex, and Agent Skills-compatible tools.
@@ -155,4 +155,4 @@ metadata:
 
 ## 版本
 
-1.4.0
+1.5.0

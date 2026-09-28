@@ -9,10 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `training-plan-interpretation`
-- Evaluation date: 2026-09-27
+- Evaluation date: 2026-09-28
 - Evaluator version: `0.3.0`
 - Evaluated source: `DBZQ30/SparkPath-DGX-SPARK`
-- Evaluated source revision: `73fa2372cadbcd051d7c79c002024eb5280ea8b0`
+- Evaluated source revision: `85746b6f99c0252700162bdf00ebddc7f8c10f55`
 - Evaluator container revision: not recorded (not supplied by the orchestration input)
 - Agents: Claude Code (`step-3.7-flash`), Codex (`deepseek-flash`)
 - Tasks: 10 evaluation tasks (7 positive, 3 negative)
@@ -37,12 +37,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 59% → 83% (+24 points) | 69% → 85% (+16 points) |
-| Security | 92% → 100% (+8 points) | 92% → 100% (+8 points) |
-| Correctness | 45% → 71% (+26 points) | 65% → 94% (+29 points) |
-| Discoverability | 54% → 80% (+25 points) | 60% → 55% (-5 points) |
-| Effectiveness | 46% → 67% (+21 points) | 57% → 84% (+27 points) |
-| Efficiency | 58% → 99% (+41 points) | 71% → 90% (+19 points) |
+| Overall | 57% → 81% (+24 points) | 63% → 86% (+22 points) |
+| Security | 100% → 100% (±0 points) | 92% → 100% (+8 points) |
+| Correctness | 36% → 67% (+32 points) | 60% → 82% (+22 points) |
+| Discoverability | 52% → 82% (+30 points) | 44% → 64% (+19 points) |
+| Effectiveness | 35% → 67% (+32 points) | 63% → 82% (+20 points) |
+| Efficiency | 64% → 91% (+27 points) | 58% → 100% (+42 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 

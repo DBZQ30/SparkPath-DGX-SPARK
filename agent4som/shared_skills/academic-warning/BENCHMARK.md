@@ -9,10 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `academic-warning`
-- Evaluation date: 2026-09-27
+- Evaluation date: 2026-09-28
 - Evaluator version: `0.3.0`
 - Evaluated source: `DBZQ30/SparkPath-DGX-SPARK`
-- Evaluated source revision: `73fa2372cadbcd051d7c79c002024eb5280ea8b0`
+- Evaluated source revision: `85746b6f99c0252700162bdf00ebddc7f8c10f55`
 - Evaluator container revision: not recorded (not supplied by the orchestration input)
 - Agents: Claude Code (`step-3.7-flash`), Codex (`deepseek-flash`)
 - Tasks: 17 evaluation tasks (14 positive, 3 negative)
@@ -37,12 +37,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 61% → 81% (+20 points) | 71% → 93% (+22 points) |
-| Security | 100% → 100% (±0 points) | 95% → 94% (-1 points) |
-| Correctness | 63% → 79% (+16 points) | 77% → 100% (+23 points) |
-| Discoverability | 46% → 69% (+22 points) | 48% → 72% (+24 points) |
-| Effectiveness | 46% → 77% (+31 points) | 71% → 98% (+27 points) |
-| Efficiency | 52% → 81% (+29 points) | 63% → 100% (+37 points) |
+| Overall | 66% → 88% (+22 points) | 83% → 93% (+10 points) |
+| Security | 100% → 100% (±0 points) | 82% → 94% (+12 points) |
+| Correctness | 66% → 90% (+24 points) | 100% → 100% (±0 points) |
+| Discoverability | 52% → 78% (+26 points) | 57% → 75% (+17 points) |
+| Effectiveness | 55% → 84% (+29 points) | 95% → 96% (+1 points) |
+| Efficiency | 57% → 89% (+32 points) | 79% → 100% (+21 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
@@ -65,10 +65,10 @@ Test execution limitations:
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** PII/phone\_numbers: International phone number: +0.2846 (`CHANGELOG.md:36`)
+- **MEDIUM** PII/phone\_numbers: International phone number: +0.2846 (`CHANGELOG.md:47`)
 - **MEDIUM** SCHEMA/folder\_hierarchy: Skill not in standard location (skills/ or team-skills/) (`academic-warning`)
 - **LOW** SCHEMA/unexpected\_file: Unexpected 'CHANGELOG.md' in skill root (`CHANGELOG.md`)
-- **LOW** UNICODE/isolated\_invisible\_char: Isolated invisible character(s) (1): VARIATION SELECTOR-16 (`CHANGELOG.md:11`)
+- **LOW** UNICODE/isolated\_invisible\_char: Isolated invisible character(s) (1): VARIATION SELECTOR-16 (`CHANGELOG.md:22`)
 
 </details>
 

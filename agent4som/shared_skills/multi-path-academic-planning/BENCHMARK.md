@@ -9,10 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `multi-path-academic-planning`
-- Evaluation date: 2026-09-27
+- Evaluation date: 2026-09-28
 - Evaluator version: `0.3.0`
 - Evaluated source: `DBZQ30/SparkPath-DGX-SPARK`
-- Evaluated source revision: `73fa2372cadbcd051d7c79c002024eb5280ea8b0`
+- Evaluated source revision: `85746b6f99c0252700162bdf00ebddc7f8c10f55`
 - Evaluator container revision: not recorded (not supplied by the orchestration input)
 - Agents: Claude Code (`step-3.7-flash`), Codex (`deepseek-flash`)
 - Tasks: 11 evaluation tasks (8 positive, 3 negative)
@@ -37,12 +37,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 60% → 93% (+33 points) | 78% → 93% (+15 points) |
+| Overall | 57% → 91% (+34 points) | 83% → 92% (+9 points) |
 | Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 50% → 91% (+41 points) | 77% → 100% (+23 points) |
-| Discoverability | 49% → 89% (+40 points) | 62% → 67% (+5 points) |
-| Effectiveness | 48% → 88% (+40 points) | 76% → 96% (+20 points) |
-| Efficiency | 53% → 98% (+44 points) | 75% → 100% (+25 points) |
+| Correctness | 41% → 89% (+48 points) | 91% → 98% (+7 points) |
+| Discoverability | 43% → 77% (+34 points) | 56% → 66% (+10 points) |
+| Effectiveness | 48% → 92% (+44 points) | 85% → 96% (+11 points) |
+| Efficiency | 53% → 98% (+45 points) | 81% → 100% (+19 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Uplift is `skill score - baseline score`, shown in percentage points.
 
