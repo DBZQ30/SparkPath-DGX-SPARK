@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 仓库概览
 
-SparkPath：「**本科新生学业规划智能助手**」—— 面向高校教务的 AI 智能助手（RAG 知识库 + 业务 Skill），部署在 DGX Spark 单机上，通过微信小程序交付。本仓库是 monorepo，由四部分组成：
+SparkPath：「**本科新生学业规划智能助手**」—— 面向高校本科新生和教务的 AI 智能助手（RAG 知识库 + 业务 Skill），部署在 DGX Spark 单机上，通过微信小程序交付。本仓库是 monorepo，由四部分组成：
 
 | 目录 | 角色 |
 |------|------|
