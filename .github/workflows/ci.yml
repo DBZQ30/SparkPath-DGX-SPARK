@@ -42,8 +42,12 @@ jobs:
           pip install -r agent4som/requirements-dev.txt
       - name: pytest (Hermes-independent subset)
         working-directory: agent4som
+        # 被 ignore 的目录/文件均依赖上游 Hermes 框架（~/.hermes/hermes-agent）：
+        # CI 是干净 checkout、不安装该框架，靠 tests/conftest.py 的 sys.path 注入也拿不到，
+        # 故在 collection 阶段即会 ModuleNotFoundError，必须显式排除。
         run: |
           python -m pytest tests/ \
+            --ignore=tests/hermes_overlay \
             --ignore=tests/knowledge_base/auth/test_gateway_role_resolution.py \
             --ignore=tests/knowledge_base/auth/test_permission_intersection.py \
             --ignore=tests/repro \

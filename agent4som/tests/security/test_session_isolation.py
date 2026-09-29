@@ -107,19 +107,35 @@ class _BoomOrch:
         raise AssertionError("student 写 global 本不应到达 ingest_file")
 
 
+def _knowledge_ingest_module():
+    """加载 hermes_overlay 的 knowledge_ingest（依赖上游 ``tools.registry``）。
+
+    Hermes 框架（``~/.hermes/hermes-agent``）未安装时该模块不可导入 ——
+    CI 是干净 checkout、不装框架，此时跳过依赖它的用例而非报错
+    （口径同 tests/knowledge_base/auth/test_gateway_role_resolution.py）。
+    """
+    import importlib.util
+    from pathlib import Path
+
+    try:
+        import tools.registry  # noqa: F401
+    except ModuleNotFoundError as exc:  # pragma: no cover - CI 环境分支
+        pytest.skip(f"Hermes 框架未安装（~/.hermes/hermes-agent 缺失）：{exc}")
+
+    src = Path(__file__).resolve().parents[2] / "hermes_overlay" / "tools" / "knowledge_ingest.py"
+    spec = importlib.util.spec_from_file_location("ki_isolation_probe", src)
+    ki = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ki)
+    return ki
+
+
 def test_ingest_permission_rechecked_per_call():
     """同一 worker 上角色混杂调用：权限决策不是一次性缓存。
 
     学生 → global 拒；随后的 admin → global 放行；再来的学生 → 仍拒。
     若权限结果被（角色无关地）缓存，第二个学生的调用会被错误放行。
     """
-    import importlib.util
-    from pathlib import Path
-
-    src = Path(__file__).resolve().parents[2] / "hermes_overlay" / "tools" / "knowledge_ingest.py"
-    spec = importlib.util.spec_from_file_location("ki_isolation_probe", src)
-    ki = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(ki)
+    ki = _knowledge_ingest_module()
 
     boom = _BoomOrch()
 
@@ -156,13 +172,7 @@ def test_ingest_permission_rechecked_per_call():
 
 def test_cross_user_personal_scope_still_denied_after_admin_call():
     """admin 调用后，学生写他人个人库仍拒（时序不产生权限残留）。"""
-    import importlib.util
-    from pathlib import Path
-
-    src = Path(__file__).resolve().parents[2] / "hermes_overlay" / "tools" / "knowledge_ingest.py"
-    spec = importlib.util.spec_from_file_location("ki_isolation_probe2", src)
-    ki = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(ki)
+    ki = _knowledge_ingest_module()
 
     denied = ki._ingest_one(_BoomOrch(), "s1", "/x/f.pdf", "f.pdf",
                             "users/victim", "student")
